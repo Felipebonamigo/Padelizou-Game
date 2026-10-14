@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em 105ca75
+# gabarito do Padel.Core em f88ae65
 id,quadro,x,y,z,vx,vy,vz,wx,wy,wz,emJogo,rolando,parada
 0,0,2,5,2.54,0,0,0,0,0,0,1,0,0
 0,3,2,5,2.5267172,0,0,-0.49040765,0,0,0,1,0,0

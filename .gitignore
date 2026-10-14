@@ -18,3 +18,4 @@ DerivedDataCache/
 *.VC.opendb
 Plugins/*/Binaries/
 Plugins/*/Intermediate/
+/build-*/

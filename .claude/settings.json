@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$CLAUDE_CODE_REMOTE\" = \"true\" ] || exit 0; cd \"$CLAUDE_PROJECT_DIR\" && cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release > /dev/null && cmake --build build > /dev/null && echo '==> PadelSim compilado em build/ (rode: ctest --test-dir build)' || echo '==> PadelSim NÃO compilou: rode o cmake à mão e leia o erro'",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  }
+}

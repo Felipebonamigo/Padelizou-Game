@@ -6,6 +6,7 @@
 #pragma once
 
 #include "PadelSim/Tipos.h"
+#include <cstdint>
 #include <vector>
 
 namespace padel
@@ -48,6 +49,10 @@ public:
 
     /// Avança dt segundos em sub-passos de até PassoMaximo, acumulando os eventos do intervalo.
     void Avancar(float dt, std::vector<EventoDaBola>& eventos);
+
+    /// Quantos sub-passos de integração as bolas deram NESTA thread até agora (qualquer bola). Os solucionadores dos
+    /// golpes especiais têm orçamento contado por ele — então ele decide resultado, não é só diagnóstico.
+    static int64_t SubPassosNestaThread();
 
 private:
     void Passo(float h, std::vector<EventoDaBola>& eventos);

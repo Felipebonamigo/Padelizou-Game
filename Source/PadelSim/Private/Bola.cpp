@@ -47,6 +47,8 @@ uint32_t HashDoContato(float x, float y, float z)
 }
 
 /// O próximo número do hash, em [0, 1) (24 bits, exatos em float).
+thread_local int64_t subPassosNestaThread = 0;
+
 float Uniforme(uint32_t& h)
 {
     h = Misturar(h + 0x9E3779B9u);
@@ -92,16 +94,21 @@ void Bola::Lancar(const Velocidade& v)
 float Bola::Rapidez() const { return std::sqrt(Vx * Vx + Vy * Vy + Vz * Vz); }
 float Bola::Spin() const { return std::sqrt(Wx * Wx + Wy * Wy + Wz * Wz); }
 
+int64_t Bola::SubPassosNestaThread() { return subPassosNestaThread; }
+
 void Bola::Avancar(float dt, std::vector<EventoDaBola>& eventos)
 {
     if (!EmJogo || Parada) return;
     float restante = dt;
+    int32_t subPassos = 0;
     while (restante > 1e-7f && EmJogo && !Parada)
     {
         float h = std::min(PassoMaximo, restante);
         Passo(h, eventos);
         restante -= h;
+        subPassos++;
     }
+    subPassosNestaThread += subPassos;
 }
 
 void Bola::Passo(float h, std::vector<EventoDaBola>& eventos)
