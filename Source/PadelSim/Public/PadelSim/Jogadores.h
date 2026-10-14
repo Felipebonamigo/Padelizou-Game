@@ -16,18 +16,23 @@ class Arbitro;
 class Partida;
 
 /// ChanceDeRemateParaFora: com a bola muito alta perto da rede, quanto tenta o remate por 3 / por 4 (se a física deixar).
+/// A formação da dupla (Padel.Core/Jogadores.cs, PerfilDeIA, com o porquê de cada número): AtrasoDaFormacao (s) — quanto
+/// quem não bateu demora pra acompanhar a dupla e a bola; AcompanhamentoDaBola (0 a 1) — quanto o centro da dupla segue o
+/// x da bola; SeparacaoDaDupla (m); FolgaDoBloco (m) — a maior diferença de profundidade aceita do parceiro;
+/// ChanceDeDesencontro (0 a 1) — em cada mudança, a chance de quem não bateu nem perceber.
 struct PerfilDeIA
 {
     float Velocidade, Reacao, ErroDeMira, ErroDePrevisao, ChanceDeErro, ChanceDeLob, ChanceDeRemateParaFora = 0;
+    float AtrasoDaFormacao = 0.35f, AcompanhamentoDaBola = 0.35f, SeparacaoDaDupla = 4.0f, FolgaDoBloco = 1.0f, ChanceDeDesencontro = 0;
 };
 
 namespace perfis
 {
-inline constexpr PerfilDeIA Facil{4.6f, 0.45f, 1.5f, 1.1f, 0.14f, 0.2f, 0.05f};
-inline constexpr PerfilDeIA Medio{5.6f, 0.25f, 0.9f, 0.7f, 0.07f, 0.3f, 0.15f};
-inline constexpr PerfilDeIA Dificil{6.6f, 0.10f, 0.5f, 0.35f, 0.025f, 0.35f, 0.30f};
+inline constexpr PerfilDeIA Facil{4.6f, 0.45f, 1.5f, 1.1f, 0.14f, 0.2f, 0.05f, 0.7f, 0.15f, 5.0f, 2.5f, 0.3f};
+inline constexpr PerfilDeIA Medio{5.6f, 0.25f, 0.9f, 0.7f, 0.07f, 0.3f, 0.15f, 0.35f, 0.35f, 4.0f, 1.0f, 0};
+inline constexpr PerfilDeIA Dificil{6.6f, 0.10f, 0.5f, 0.35f, 0.025f, 0.35f, 0.30f, 0.10f, 0.5f, 3.6f, 0.5f, 0};
 /// O parceiro do humano: confiável sem ser um muro.
-inline constexpr PerfilDeIA Parceiro{5.8f, 0.18f, 0.8f, 0.55f, 0.04f, 0.3f, 0.15f};
+inline constexpr PerfilDeIA Parceiro{5.8f, 0.18f, 0.8f, 0.55f, 0.04f, 0.3f, 0.15f, 0.2f, 0.4f, 3.8f, 0.8f, 0};
 const PerfilDeIA& Por(Dificuldade d);
 } // namespace perfis
 
@@ -106,10 +111,16 @@ private:
 };
 
 /// Controla os jogadores de um time que não são humanos: prevê a bola com a mesma física, decide quem busca e onde
-/// (com erro de leitura que afina enquanto a bola chega), e escolhe o golpe.
+/// (com erro de leitura que afina enquanto a bola chega), e escolhe o golpe. Quem não vai na bola joga em formação: os
+/// dois andam como um bloco na profundidade (rede ou fundo, subindo e recuando juntos) e na largura (o centro segue a
+/// bola; o "cambio" cobre o lado vazio). O parceiro IA de um humano segue a formação do humano. Detalhes no C#.
 class IA
 {
 public:
+    static constexpr float ProfundidadeDaRede = 3.2f;
+    static constexpr float ProfundidadeDoFundo = 6.5f;
+    static constexpr float ProfundidadeMaximaDoBloco = 8.0f;
+
     IA(int32_t time, const PerfilDeIA& perfil, Aleatorio& aleatorio);
 
     int32_t Time;
@@ -140,6 +151,20 @@ private:
     Aleatorio* aleatorio;
     std::optional<Plano> plano;
     float relogio = 0;
+    // Formação de cada jogador (pelo Indice): a que ele segue agora, a que vai seguir e quando.
+    Formacao formacao[2] = {Formacao::Fundo, Formacao::Fundo};
+    std::optional<Formacao> pendente[2];
+    float mudaEm[2] = {0, 0};
+    bool esperaOParceiro[2] = {false, false};
+    bool ladosTrocados = false;
+    float xDaBolaLido = 0;
+    float profundidadeDoHumanoLida = 0;
+    bool humanoNaRede = false;
+
+    void MudarFormacao(Partida& partida, Formacao nova, const Jogador& quem);
+    std::pair<float, float> LugarNaFormacao(Jogador& j, const Jogador& parceiro, const std::optional<Plano>& p);
+    int32_t VagaDe(const Jogador& j) const;
+    void CobrirOOutroLado(const Jogador& j, float xDele, float centro);
 
     void Planejar(Partida& partida, bool novaTrajetoria);
     float ErroDeLeitura(float segundosAteABola) const;

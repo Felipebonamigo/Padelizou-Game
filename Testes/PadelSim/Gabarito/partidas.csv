@@ -1,10 +1,10 @@
-# gabarito do Padel.Core em 73871f4
+# gabarito do Padel.Core em fbb69bf
 id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets
-0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,58713,6-1,0,0,39,309,32,0,0
-1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,28474,6-0,0,0,26,126,12,0,0
-2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,72398,0-6,1,0,33,437,47,0,0
-3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,86461,6-4,0,0,55,482,31,0,0
-4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,76341,3-6,1,0,50,463,34,0,0
-5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,24412,11-5,0,0,16,135,20,0,0
-6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,33828,6-0,0,0,35,148,10,1,0
-7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,56575,4-1,0,0,31,350,66,0,0
+0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,88800,6-4,0,0,61,533,29,0,0
+1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,33598,6-0,0,0,30,160,13,0,0
+2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,126951,4-6,1,0,57,824,53,0,0
+3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,119157,7-6(4),0,0,76,687,30,0,0
+4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,73674,3-6,1,0,49,404,27,0,0
+5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,27167,9-7,0,0,16,173,38,0,0
+6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,52690,6-3,0,0,54,242,14,0,0
+7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,95639,5-4(6),0,0,60,552,37,0,0

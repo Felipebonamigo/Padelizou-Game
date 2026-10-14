@@ -206,6 +206,14 @@ namespace
 constexpr float AlturaDoRemateParaFora = 2.2f, DistanciaDaRedeDoRemateParaFora = 4.f;
 /// Com os dois adversários na rede e a bola baixa no fundo, metade das vezes chiquita.
 constexpr float ChanceDeChiquita = 0.5f;
+/// Até onde o corpo vai na largura (o mesmo limite do Jogador).
+constexpr float LimiteLateralDoCorpo = 4.7f;
+/// O meio de cada metade da largura: onde fica o parceiro de um humano.
+constexpr float MeioDaMetade = 2.5f;
+/// A formação do parceiro humano: a menos de ZonaDeRede da rede ele subiu; a mais de LinhaDaFrente ele voltou.
+constexpr float ZonaDeRede = 4.5f, LinhaDaFrente = 5.5f;
+
+Jogador* ParceiroDe(const std::array<Jogador*, 2>& meus, const Jogador& j) { return meus[0] == &j ? meus[1] : meus[0]; }
 } // namespace
 
 IA::IA(int32_t time, const PerfilDeIA& perfil, Aleatorio& a) : Time(time), Perfil(perfil), aleatorio(&a) {}
@@ -219,6 +227,19 @@ std::optional<int32_t> IA::Responsavel() const
 void IA::AoSacar(Partida& partida, int32_t timeSacador)
 {
     Posicao = timeSacador == Time ? Formacao::Rede : Formacao::Fundo;   // quem saca sobe; quem recebe fica atrás
+    // Ponto novo: os dois sabem onde a dupla fica, e cada um joga do lado em que começou.
+    for (int i = 0; i < 2; i++) { formacao[i] = Posicao; pendente[i].reset(); esperaOParceiro[i] = false; }
+    auto meus = partida.JogadoresDoTime(Time);
+    Jogador* indice0 = meus[0]->Indice == 0 ? meus[0] : meus[1];
+    Jogador* indice1 = meus[0]->Indice == 0 ? meus[1] : meus[0];
+    ladosTrocados = indice0->LateralDe(indice1->X) > 0;   // o 1 está à direita do 0
+    xDaBolaLido = partida.Bola.X;
+    for (Jogador* j : meus)
+    {
+        if (!j->Humano) continue;
+        profundidadeDoHumanoLida = std::fabs(j->Y);
+        humanoNaRede = profundidadeDoHumanoLida < ZonaDeRede;
+    }
     Planejar(partida, true);
 }
 
@@ -230,9 +251,32 @@ void IA::AoGolpear(Partida& partida, const Golpe& golpe, const Jogador& jogador)
         TipoDeGolpe t = golpe.Tipo;
         bool sobe = t == TipoDeGolpe::Lob || t == TipoDeGolpe::Smash || t == TipoDeGolpe::Bandeja || t == TipoDeGolpe::Vibora ||
                     t == TipoDeGolpe::Chiquita || t == TipoDeGolpe::SmashPor3 || t == TipoDeGolpe::SmashPor4;   // a chiquita é o passaporte pra rede
-        Posicao = sobe || naFrente ? Formacao::Rede : Formacao::Fundo;
+        MudarFormacao(partida, sobe || naFrente ? Formacao::Rede : Formacao::Fundo, jogador);
+        esperaOParceiro[0] = esperaOParceiro[1] = true;
+    }
+    else
+    {
+        esperaOParceiro[0] = esperaOParceiro[1] = false;
     }
     Planejar(partida, true);
+}
+
+/// A dupla muda (ou confirma) a formação: quem mandou segue na hora; o outro, depois de AtrasoDaFormacao — ou, com
+/// ChanceDeDesencontro, nem percebe. O parceiro de um humano não entra: ele segue o humano.
+void IA::MudarFormacao(Partida& partida, Formacao nova, const Jogador& quem)
+{
+    Posicao = nova;
+    auto meus = partida.JogadoresDoTime(Time);
+    for (Jogador* j : meus)
+    {
+        if (j->Humano || ParceiroDe(meus, *j)->Humano) continue;
+        int32_t i = j->Indice;
+        if (j == &quem || formacao[i] == nova) { formacao[i] = nova; pendente[i].reset(); continue; }
+        if (pendente[i] == nova) continue;
+        if (Perfil.ChanceDeDesencontro > 0 && aleatorio->Proximo() < Perfil.ChanceDeDesencontro) { pendente[i].reset(); continue; }
+        pendente[i] = nova;
+        mudaEm[i] = relogio + Perfil.AtrasoDaFormacao;
+    }
 }
 
 void IA::AoRebater(Partida& partida)
@@ -293,6 +337,8 @@ void IA::Planejar(Partida& partida, bool novaTrajetoria)
     novo.XDaBola = alvo.X;
     novo.RuidoX = ruidoX;
     plano = novo;
+    // A bola vai passar por cima da dupla na rede (quem vai nela vai buscá-la atrás da linha de saque): recuam juntos.
+    if (Posicao == Formacao::Rede && std::fabs(plano->AlvoY) >= quadra::LinhaDeSaque) MudarFormacao(partida, Formacao::Fundo, *escolhido);
 }
 
 float IA::ErroDeLeitura(float segundosAteABola) const { return Perfil.ErroDePrevisao * mat::Limitar(segundosAteABola / 0.8f, 0, 1); }
@@ -340,7 +386,16 @@ std::vector<IA::Candidato> IA::Prever(const Bola& bola, const Arbitro& arbitro) 
 void IA::Reagir(float dt, Partida& partida)
 {
     relogio += dt;
-    for (Jogador* j : partida.JogadoresDoTime(Time))
+    auto meus = partida.JogadoresDoTime(Time);
+    // O que a dupla acompanha anda atrasado de AtrasoDaFormacao (filtro de primeira ordem): o x da bola e a profundidade
+    // do parceiro humano.
+    float alfa = dt / (mat::Max(Perfil.AtrasoDaFormacao, dt) + dt);
+    xDaBolaLido += (partida.Bola.X - xDaBolaLido) * alfa;
+    for (Jogador* j : meus) if (j->Humano) profundidadeDoHumanoLida += (std::fabs(j->Y) - profundidadeDoHumanoLida) * alfa;
+    for (int i = 0; i < 2; i++)
+        if (pendente[i] && relogio >= mudaEm[i]) { formacao[i] = *pendente[i]; pendente[i].reset(); }
+
+    for (Jogador* j : meus)
     {
         if (j->Humano) continue;
         if (plano && plano->Responsavel == j)
@@ -350,10 +405,62 @@ void IA::Reagir(float dt, Partida& partida)
         }
         else
         {
-            float profundidade = Posicao == Formacao::Rede ? 3.2f : 6.5f;
-            j->IrPara(j->XDaMetade(), j->Lado * profundidade, dt);
+            auto [x, profundidade] = LugarNaFormacao(*j, *ParceiroDe(meus, *j), plano);
+            j->IrPara(x, j->Lado * profundidade, dt);
         }
     }
+}
+
+/// Onde o jogador fica na formação: x no mundo e profundidade (m da rede). O porquê de cada linha está no C#.
+std::pair<float, float> IA::LugarNaFormacao(Jogador& j, const Jogador& parceiro, const std::optional<Plano>& p)
+{
+    int32_t i = j.Indice;
+    float separacao = Perfil.SeparacaoDaDupla;
+    float limiteDoCentro = mat::Max(0, LimiteLateralDoCorpo - separacao / 2);
+    float centro = mat::Limitar(Perfil.AcompanhamentoDaBola * xDaBolaLido, -limiteDoCentro, limiteDoCentro);
+    if (parceiro.Humano)
+    {
+        // O humano não segue a IA: a IA lê a formação dele (com histerese) e fica no meio da sua metade.
+        if (profundidadeDoHumanoLida < ZonaDeRede) humanoNaRede = true;
+        else if (profundidadeDoHumanoLida > LinhaDaFrente) humanoNaRede = false;
+        CobrirOOutroLado(j, parceiro.X, 0);
+        return {j.Lado * VagaDe(j) * MeioDaMetade, humanoNaRede ? ProfundidadeDaRede : ProfundidadeDoFundo};
+    }
+
+    float minha = formacao[i] == Formacao::Rede ? ProfundidadeDaRede : ProfundidadeDoFundo;
+    float profundidade = minha;
+    float folga = Perfil.FolgaDoBloco;
+    if (p && p->Responsavel == &parceiro)
+    {
+        // O parceiro vai na bola: quem fica anda até a folga da profundidade dele e, se ele foi bem do lado de cá, troca.
+        if (formacao[i] == Posicao && relogio - p->CriadoEm >= Perfil.AtrasoDaFormacao)
+        {
+            float dele = std::fabs(p->AlvoY);
+            profundidade = mat::Limitar(mat::Limitar(minha, dele - folga, dele + folga), ProfundidadeDaRede, ProfundidadeMaximaDoBloco);
+            CobrirOOutroLado(j, XDoCorpo(*p, parceiro), centro);
+        }
+    }
+    else if (esperaOParceiro[i] && formacao[i] == formacao[parceiro.Indice])
+    {
+        // Indo pra formação depois de um golpe da dupla: quem está mais à frente espera o outro chegar à folga, uma vez.
+        float eu = std::fabs(j.Y);
+        float ele = std::fabs(parceiro.Y) + parceiro.Vy * parceiro.Lado * j.Velocidade / (2 * j.Aceleracao);
+        float frente = (eu - ele) * mat::Sinal(minha - eu);
+        if (frente > folga) profundidade = eu;
+        else esperaOParceiro[i] = false;
+    }
+    return {centro + j.Lado * VagaDe(j) * separacao / 2, profundidade};
+}
+
+/// +1 se o jogador está na vaga da direita da dupla (no referencial dela), -1 se na da esquerda.
+int32_t IA::VagaDe(const Jogador& j) const { return (j.Indice == 0 ? 1 : -1) * (ladosTrocados ? -1 : 1); }
+
+/// O "cambio": o parceiro (xDele, no mundo) passou do centro da dupla, pro lado da vaga de j, por mais de um quarto da
+/// separação — e j troca de vaga, cobrindo o lado vazio. O quarto da separação é a histerese.
+void IA::CobrirOOutroLado(const Jogador& j, float xDele, float centro)
+{
+    int32_t ladoDaMinhaVaga = j.Lado * VagaDe(j);   // no mundo
+    if ((xDele - centro) * ladoDaMinhaVaga > Perfil.SeparacaoDaDupla / 4) ladosTrocados = !ladosTrocados;
 }
 
 Golpe IA::EscolherGolpe(Jogador& jogador, const Bola& bola, Partida& partida)

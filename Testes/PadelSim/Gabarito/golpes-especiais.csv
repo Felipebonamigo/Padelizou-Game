@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em 73871f4
+# gabarito do Padel.Core em fbb69bf
 id,solucionador,x0,y0,z0,ladoDoAlvo,argumento,subPassos,achou,alvoX,alvoY,tempoDeVoo,tipo,ignorarRede,topspinRpm,sidespinRpm,lado,temLancamento,vx,vy,vz,tempo,wx,wy,wz
 0,chiquita,-3.5,-0.3,0.35,1,-4.8,3526,1,-4.458173,1.9038012,1.0499994,9,0,800,0,0,1,-0.93807805,2.1575794,4.9281144,0,-76.82828,-33.4036,0
 1,chiquita,0.4,-0.3,0.9,1,-2,2386,1,-1.9281055,1.9311008,0.8333329,9,0,800,0,0,1,-2.9105246,2.7892525,3.0600784,0,-57.964924,-60.48514,0

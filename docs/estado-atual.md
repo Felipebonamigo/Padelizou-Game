@@ -2,6 +2,20 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 14/10/2026 (noite, 3) — a dupla da IA em formação
+
+- O trabalho da Onda 5 do Arena (25/09), que estava num worktree sem commit, entrou no `Padel.Core` (`fbb69bf`): quem
+  não vai na bola anda em bloco com o parceiro (sobe depois de golpe que dá tempo, recua quando a bola passa por cima),
+  o centro da dupla segue a bola, o "cambio" cobre o lado vazio, e o parceiro IA de um humano lê a formação dele. É o
+  item que o design chama de "o que mais dá cara de padel depois da animação". Números por nível no `PerfilDeIA`.
+- Porte em C++ (`IA::LugarNaFormacao` e companhia): as 8 partidas do gabarito iguais ao Core na primeira rodada.
+- **Equilíbrio (decisão D10 do Felipe, em aberto):** a formação deixa a IA mais difícil para o humano, sobretudo no
+  Fácil e no Médio (Iniciante × Médio: 48,2 → 39,9 % dos pontos; tabela completa no `REALISMO.md` do Arena).
+- **Duração da partida curta** (formato de 4 games, super tie-break a 10), 20 partidas por par, humano simulado no
+  manual: Intermediário × Médio 6,1 min de mediana (3,5 a 12,6), Avançado × Médio 5,2 (3,4 a 10,8), Intermediário ×
+  Fácil 2,9 (2,5 a 4,7), Avançado × Difícil 7,5 (4,2 a 15,6). A meta do pilar 3 é 4 a 6 min: o Médio está nela; as
+  pontas longas são os sets que vão a 4-4 e ao super tie-break.
+
 ## 14/10/2026 (noite, 2) — formato curto: set até 4 games, super tie-break a 10
 
 - Pilar 3 do design (partida de 4 a 6 minutos). No `Padel.Core` (`73871f4`): `Placar.GamesPorSet` (padrão 6) e
