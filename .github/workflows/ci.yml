@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  padelsim:
+    # A física pura, fora do Unreal, contra o gabarito do Padel.Core. MSVC entra porque é o compilador do Unreal no
+    # Windows: se o resultado mudar lá, o online entre PC e Steam Deck (clang) quebra.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, nome: gcc }
+          - { os: ubuntu-latest, nome: clang, cxx: clang++ }
+          - { os: windows-latest, nome: msvc }
+    runs-on: ${{ matrix.os }}
+    name: PadelSim (${{ matrix.nome }})
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar
+        shell: bash
+        run: |
+          if [ -n "${{ matrix.cxx }}" ]; then export CXX=${{ matrix.cxx }}; fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Compilar
+        run: cmake --build build --config Release
+      - name: Testar
+        run: ctest --test-dir build -C Release --output-on-failure
