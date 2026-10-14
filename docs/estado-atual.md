@@ -25,6 +25,12 @@ Diário em ordem cronológica reversa: o mais novo em cima.
   dão bits diferentes; até versões da glibc diferem (a 2.41 começou a trocar funções float por versões corretamente
   arredondadas). Hoje: o jogo online não sofre (o Unreal replica do servidor), mas a prova bit a bit só vale no Linux
   com a glibc 2.39 — no Windows, as partidas do gabarito são informativas.
+- **Medido no CI (MSVC, run 38631675205, 14/10):** compila limpo com `/W4 /WX`; bola, `PassoFixo`, placar e
+  árbitro dão 0 falhas. Nos golpes especiais, 12 falhas em 4.742 verificações, todas no remate por 3 e por 4 (os que
+  usam `sinf`/`cosf`/`atan2f`), de 1 a 6 ulps (pior: 9,5e-07 m/s); a chiquita (`expf`/`powf`) e a contrapared batem
+  inteiras, e o orçamento de sub-passos é igual em todas. Nas partidas, 1 das 7 bate inteira (pontos corridos 16);
+  nas outras, a primeira diferença aparece entre 11 s e 2 min 15 s de jogo (passo 1.320 a 16.200), também no último
+  dígito (ex.: velocidade de um jogador 0,7803393 contra 0,7803391).
 - Saída proposta: o `Padel.Core` troca essas seis funções por versões próprias, só com soma, multiplicação, divisão
   e raiz (as 17 elevações e os azimutes do remate por 3 cabem numa tabela; o remate por 4 gira um vetor com seno e
   cosseno constantes; o gaussiano pode usar o método polar, que só precisa de `log` — ou uma tabela). Muda o Core que
