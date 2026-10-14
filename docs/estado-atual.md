@@ -2,6 +2,23 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 14/10/2026 (noite, 4) — revisão da formação: o cambio e o time do humano
+
+- A revisão adversarial da Onda 5 achou três defeitos, corrigidos no `Padel.Core` (`2b7d8a5`) com teste escrito antes
+  e visto falhar:
+  - o cambio contava o parceiro que ia buscar a bola no meio da metade DELE como invasor (o centro da dupla anda com
+    a bola): no Difícil, 54 de 150 cambios faziam quem ficava cruzar a quadra pelo parceiro. Agora o parceiro tem de
+    invadir a metade de quem fica;
+  - a releitura da bola (quique, parede) desfazia a troca no meio do caminho (11 de 70 em menos de 0,6 s): agora é
+    um cambio por trajetória;
+  - no time de um humano, a formação guardada ficava a do saque; se o humano virasse IA no meio do ponto (o servidor
+    faz isso com quem cai), ia pro fundo com a dupla na rede.
+- Core 667 testes verdes; Arena `verificar_tudo.sh` verde. As tabelas da formação no `REALISMO.md` foram remedidas: os
+  números "antes" eram de antes da troca da libm e não se reproduziam.
+- Gabarito regerado; antes do porte o C++ reprovou onde devia (partidas 0–5 e 7). Porte em `Jogadores.cpp`
+  (`CobrirOOutroLado` devolve se trocou; `cambioNaTrajetoria`): 6 testes com 0 falhas, gcc e clang.
+- **D10 remedido:** Iniciante × Médio 43,9 → 37,6 % dos pontos (21 → 4 % das partidas); o resto no `REALISMO.md`.
+
 ## 14/10/2026 (noite, 3) — a dupla da IA em formação
 
 - O trabalho da Onda 5 do Arena (25/09), que estava num worktree sem commit, entrou no `Padel.Core` (`fbb69bf`): quem
@@ -10,7 +27,8 @@ Diário em ordem cronológica reversa: o mais novo em cima.
   item que o design chama de "o que mais dá cara de padel depois da animação". Números por nível no `PerfilDeIA`.
 - Porte em C++ (`IA::LugarNaFormacao` e companhia): as 8 partidas do gabarito iguais ao Core na primeira rodada.
 - **Equilíbrio (decisão D10 do Felipe, em aberto):** a formação deixa a IA mais difícil para o humano, sobretudo no
-  Fácil e no Médio (Iniciante × Médio: 48,2 → 39,9 % dos pontos; tabela completa no `REALISMO.md` do Arena).
+  Fácil e no Médio (Iniciante × Médio: 48,2 → 39,9 % dos pontos; tabela completa no `REALISMO.md` do Arena;
+  remedido na entrada acima).
 - **Duração da partida curta** (formato de 4 games, super tie-break a 10), 20 partidas por par, humano simulado no
   manual: Intermediário × Médio 6,1 min de mediana (3,5 a 12,6), Avançado × Médio 5,2 (3,4 a 10,8), Intermediário ×
   Fácil 2,9 (2,5 a 4,7), Avançado × Difícil 7,5 (4,2 a 15,6). A meta do pilar 3 é 4 a 6 min: o Médio está nela; as

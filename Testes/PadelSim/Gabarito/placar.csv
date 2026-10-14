@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em fbb69bf
+# gabarito do Padel.Core em 2b7d8a5
 id,ouro,sets,corridos,saca,games,tb,ponto,para,evento,timeDoEvento,pontos0,pontos1,games0,games1,sets0,sets1,tieBreak,vencedor,empate,sacadorTime,sacadorJogador,ladoDoSaque,decisivo,texto0,texto1,resumo
 0,1,1,-1,0,6,7,0,1,0,1,0,1,0,0,0,0,0,-1,0,0,0,1,0,0,15,0-0
 0,1,1,-1,0,6,7,1,0,0,0,1,1,0,0,0,0,0,-1,0,0,0,0,0,15,15,0-0

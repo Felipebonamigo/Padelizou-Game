@@ -262,16 +262,15 @@ void IA::AoGolpear(Partida& partida, const Golpe& golpe, const Jogador& jogador)
 }
 
 /// A dupla muda (ou confirma) a formação: quem mandou segue na hora; o outro, depois de AtrasoDaFormacao — ou, com
-/// ChanceDeDesencontro, nem percebe. O parceiro de um humano não entra: ele segue o humano.
+/// ChanceDeDesencontro, nem percebe. No time de um humano os dois seguem na hora, sem sorteio (vale se ele virar IA).
 void IA::MudarFormacao(Partida& partida, Formacao nova, const Jogador& quem)
 {
     Posicao = nova;
     auto meus = partida.JogadoresDoTime(Time);
     for (Jogador* j : meus)
     {
-        if (j->Humano || ParceiroDe(meus, *j)->Humano) continue;
         int32_t i = j->Indice;
-        if (j == &quem || formacao[i] == nova) { formacao[i] = nova; pendente[i].reset(); continue; }
+        if (j == &quem || formacao[i] == nova || j->Humano || ParceiroDe(meus, *j)->Humano) { formacao[i] = nova; pendente[i].reset(); continue; }
         if (pendente[i] == nova) continue;
         if (Perfil.ChanceDeDesencontro > 0 && aleatorio->Proximo() < Perfil.ChanceDeDesencontro) { pendente[i].reset(); continue; }
         pendente[i] = nova;
@@ -437,7 +436,9 @@ std::pair<float, float> IA::LugarNaFormacao(Jogador& j, const Jogador& parceiro,
         {
             float dele = std::fabs(p->AlvoY);
             profundidade = mat::Limitar(mat::Limitar(minha, dele - folga, dele + folga), ProfundidadeDaRede, ProfundidadeMaximaDoBloco);
-            CobrirOOutroLado(j, XDoCorpo(*p, parceiro), centro);
+            // Um cambio por trajetória: a releitura (quique, parede) não desfaz a troca no meio do caminho.
+            if (p->CriadoEm != cambioNaTrajetoria && CobrirOOutroLado(j, XDoCorpo(*p, parceiro), centro))
+                cambioNaTrajetoria = p->CriadoEm;
         }
     }
     else if (esperaOParceiro[i] && formacao[i] == formacao[parceiro.Indice])
@@ -455,12 +456,15 @@ std::pair<float, float> IA::LugarNaFormacao(Jogador& j, const Jogador& parceiro,
 /// +1 se o jogador está na vaga da direita da dupla (no referencial dela), -1 se na da esquerda.
 int32_t IA::VagaDe(const Jogador& j) const { return (j.Indice == 0 ? 1 : -1) * (ladosTrocados ? -1 : 1); }
 
-/// O "cambio": o parceiro (xDele, no mundo) passou do centro da dupla, pro lado da vaga de j, por mais de um quarto da
-/// separação — e j troca de vaga, cobrindo o lado vazio. O quarto da separação é a histerese.
-void IA::CobrirOOutroLado(const Jogador& j, float xDele, float centro)
+/// O "cambio": o parceiro (xDele, no mundo) invadiu a metade da quadra da vaga de j e passou do centro da dupla por mais
+/// de um quarto da separação — e j troca de vaga, cobrindo o lado vazio. O quarto da separação é a histerese; a metade
+/// conta porque o centro anda com a bola. Devolve se trocou.
+bool IA::CobrirOOutroLado(const Jogador& j, float xDele, float centro)
 {
     int32_t ladoDaMinhaVaga = j.Lado * VagaDe(j);   // no mundo
-    if ((xDele - centro) * ladoDaMinhaVaga > Perfil.SeparacaoDaDupla / 4) ladosTrocados = !ladosTrocados;
+    if (xDele * ladoDaMinhaVaga <= 0 || (xDele - centro) * ladoDaMinhaVaga <= Perfil.SeparacaoDaDupla / 4) return false;
+    ladosTrocados = !ladosTrocados;
+    return true;
 }
 
 Golpe IA::EscolherGolpe(Jogador& jogador, const Bola& bola, Partida& partida)

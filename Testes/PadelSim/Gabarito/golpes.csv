@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em fbb69bf
+# gabarito do Padel.Core em 2b7d8a5
 id,nome,x0,y0,z0,alvoX,alvoY,tempoDeVoo,folgaNaRede,ignorarRede,topspinRpm,sidespinRpm,vx,vy,vz,tempo,wx,wy,wz
 0,drive,2.747993,7.055533,2.3326554,2.8176537,-9.358686,0.9,0.3,0,1200,0,0.10181431,-23.990566,1.8226608,0.9,125.66259,0.5333022,0
 1,drive,-0.71374416,-2.641734,0.8296732,-4.1301823,1.5456629,0.9,0.3,0,1200,0,-4.1559143,5.093745,3.492641,0.9,-97.36781,-79.441025,0

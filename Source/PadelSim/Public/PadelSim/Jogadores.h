@@ -5,6 +5,7 @@
 #include "PadelSim/Bola.h"
 #include "PadelSim/Golpe.h"
 
+#include <limits>
 #include <optional>
 #include <string>
 #include <utility>
@@ -157,6 +158,8 @@ private:
     float mudaEm[2] = {0, 0};
     bool esperaOParceiro[2] = {false, false};
     bool ladosTrocados = false;
+    /// O CriadoEm do plano (a trajetória da bola) em que a dupla fez o último cambio: um por trajetória.
+    float cambioNaTrajetoria = -std::numeric_limits<float>::infinity();
     float xDaBolaLido = 0;
     float profundidadeDoHumanoLida = 0;
     bool humanoNaRede = false;
@@ -164,7 +167,7 @@ private:
     void MudarFormacao(Partida& partida, Formacao nova, const Jogador& quem);
     std::pair<float, float> LugarNaFormacao(Jogador& j, const Jogador& parceiro, const std::optional<Plano>& p);
     int32_t VagaDe(const Jogador& j) const;
-    void CobrirOOutroLado(const Jogador& j, float xDele, float centro);
+    bool CobrirOOutroLado(const Jogador& j, float xDele, float centro);
 
     void Planejar(Partida& partida, bool novaTrajetoria);
     float ErroDeLeitura(float segundosAteABola) const;
