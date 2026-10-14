@@ -12,15 +12,15 @@ Nada de "pronto" sem rodar no mesmo turno e ler a saída. Zero teste vermelho pa
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ctest --test-dir build --output-on-failure
 ```
 
-Cada executável termina com uma linha `<Área>: N verificações, 0 falha(s).` — leia as cinco:
-`TestesDoPadelSim` (bola, quadra, golpes::Calcular), `TestesDosGolpesEspeciais`, `TestesDaPartida` (7 partidas
+Cada executável termina com uma linha `<Área>: N verificações, 0 falha(s).` — leia as seis:
+`TestesDaMatematica` (as funções sem libm, bit a bit, e o portão que barra a libm no motor), `TestesDoPadelSim` (bola, quadra, golpes::Calcular), `TestesDosGolpesEspeciais`, `TestesDaPartida` (7 partidas
 inteiras, passo a passo), `TestesDoPassoFixo` e `TestesDoPlacarEDoArbitro` (tie-break, sets, falta, let).
 
 - Tolerância é ZERO: o C++ reproduz o Padel.Core bit a bit. Uma diferença de 1 ulp é defeito, não arredondamento.
 - Mexeu em física ou regra? A mudança nasce no `Padel.Core` (repositório `padelizou`) com teste lá, e o gabarito
   é regerado (skill `regerar-gabarito`). Mudar só o C++ faz o gabarito reprovar — é o objetivo.
-- O CI roda gcc, clang e MSVC. Se só o MSVC cair, suspeite de libm (`log`, `cos`, `exp`, `pow`, `atan2`): a física
-  pura não usa nenhuma; o sorteio gaussiano da IA e os golpes especiais usam (ver `CLAUDE.md`).
+- O CI roda gcc, clang e MSVC e exige os mesmos bits nos três. Se só um cair, procure o que depende da máquina:
+  libm que voltou (o `TestesDaMatematica` acusa), FMA ou fast-math ligados, ou ordem de operação diferente do C#.
 
 ## No PC (Unreal)
 

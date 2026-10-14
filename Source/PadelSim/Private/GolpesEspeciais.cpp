@@ -16,6 +16,7 @@
 
 #include "PadelSim/Bola.h"
 #include "PadelSim/Golpes.h"
+#include "PadelSim/Matematica.h"
 #include "PadelSim/Quadra.h"
 
 #include <algorithm>
@@ -56,21 +57,13 @@ float Limitar(float valor, float minimo, float maximo) { return MinF(maximo, Max
 int32_t Sinal(float v) { return (v > 0) - (v < 0); }
 bool EhMaisInfinito(float v) { return v == Infinito; }   // float.IsPositiveInfinity
 
-// A libm, nos únicos pontos em que o C# chama MathF.Sin/Cos/Atan2/Exp/Pow — sempre em tempo de execução, chamada por
-// ponteiro volatile, pra o compilador não calcular na compilação o seno de uma constante (as 17 elevações do remate são
-// constantes num laço de tamanho fixo). Ele calcula com arredondamento correto (gcc pelo MPFR, clang em double), e a
-// libm nem sempre arredonda certo: na glibc 2.39, sinf(−26°) dá -0x1.c0e45ep-2 e o correto é -0x1.c0e46p-2. O laço
-// `for k < 17: std::sin(elevação k)` com -O3 dá o correto no gcc e no clang; o C# (que chama a glibc) dá o outro.
-float (*volatile const SinDaLibm)(float) = [](float x) { return std::sin(x); };
-float (*volatile const CosDaLibm)(float) = [](float x) { return std::cos(x); };
-float (*volatile const Atan2DaLibm)(float, float) = [](float y, float x) { return std::atan2(y, x); };
-float (*volatile const ExpDaLibm)(float) = [](float x) { return std::exp(x); };
-float (*volatile const PowDaLibm)(float, float) = [](float x, float y) { return std::pow(x, y); };
-float Sin(float x) { return SinDaLibm(x); }
-float Cos(float x) { return CosDaLibm(x); }
-float Atan2(float y, float x) { return Atan2DaLibm(y, x); }
-float Exp(float x) { return ExpDaLibm(x); }
-float Pow(float x, float y) { return PowDaLibm(x, y); }
+// Seno, cosseno, arco-tangente, exponencial e potência sem libm (padel::mat, o porte de MatematicaDeterministica.cs):
+// os mesmos bits em gcc, clang e MSVC, e iguais ao Padel.Core.
+float Sin(float x) { return mat::Seno(x); }
+float Cos(float x) { return mat::Cosseno(x); }
+float Atan2(float y, float x) { return mat::ArcoTangente2(y, x); }
+float Exp(float x) { return mat::Exp(x); }
+float Pow(float x, float y) { return mat::Potencia(x, y); }
 
 Golpe NovoGolpe(float alvoX, float alvoY, float tempoDeVoo, TipoDeGolpe tipo, const Efeito& efeito, const Velocidade& lancamento)
 {
@@ -294,7 +287,7 @@ std::optional<Golpe> ChiquitaDaFamilia(float x0, float y0, float z0, int32_t lad
     // intervalo fechou: essa família não tem chiquita.
     auto MudarInclinacao = [&](bool subir, float zNaRede, float zQuerido) -> bool {
         mesmoSentido = subir == (mesmoSentido > 0) ? mesmoSentido + (subir ? 1 : -1) : (subir ? 1 : -1);
-        zQuerido += (subir ? 1 : -1) * MinF(0.1f, FolgaNaRedeDaChiquita * (Pow(3.f, std::fabs(static_cast<float>(mesmoSentido)) - 1) - 1));
+        zQuerido += (subir ? 1 : -1) * MinF(0.1f, FolgaNaRedeDaChiquita * (mat::PotenciaInteira(3.f, std::abs(mesmoSentido) - 1) - 1));
         if (subir) pBaixo = MaxF(pBaixo, inclinacao);
         else pAlto = MinF(pAlto, inclinacao);
         if (!(pAlto - pBaixo > 1e-3f * (1 + std::fabs(inclinacao)))) return false;

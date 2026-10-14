@@ -26,10 +26,9 @@ Rode `ctest --test-dir build` (skill `verificar`) para ver os números de hoje. 
      encontrou.
 5. **Automation Spec `PadelSim.Gabarito`** em `Source/PadelizouGame/Private/Testes/` (ou num módulo de testes): lê
    os CSVs de `Testes/PadelSim/Gabarito/` e faz as mesmas conferências dos quatro `Testes/PadelSim/Testes*.cpp`
-   (reaproveite o código; não reescreva as regras). A bola e o `PassoFixo` precisam dar **0 falhas**. As partidas e os
-   golpes especiais usam funções da libm (`sinf`, `cosf`, `logf`…), e a do Windows dá bits diferentes da glibc em que
-   o gabarito foi gravado: rode e **relate onde a primeira diferença aparece** (partida, passo, campo) — é o dado da
-   decisão pendente em `docs/estado-atual.md`. Zero falhas ali também é possível; se acontecer, diga. Rode pela linha de comando
+   (reaproveite o código; não reescreva as regras). **Todos com 0 falhas**: o motor não usa libm, então o resultado
+   no Windows é o mesmo do Linux — o CI já prova isso com o MSVC. Uma falha aqui é o Unreal compilando com outras
+   opções de ponto flutuante (passo 4). Rode pela linha de comando
    (`UnrealEditor-Cmd ... -ExecCmds="Automation RunTests PadelSim; Quit"`) e cole a saída.
 6. **Fumaça:** um mapa vazio com uma esfera que segue `padel::Bola` a 60 quadros por segundo, lançada de
    (0, 9, 1) rumo à rede. Sem arte, sem câmera especial. Só para ver o eixo e a escala certos: o PadelSim mede em

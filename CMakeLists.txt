@@ -14,6 +14,7 @@ add_library(PadelSim STATIC
     Source/PadelSim/Private/GolpesEspeciais.cpp
     Source/PadelSim/Private/HumanoSimulado.cpp
     Source/PadelSim/Private/Jogadores.cpp
+    Source/PadelSim/Private/Matematica.cpp
     Source/PadelSim/Private/Partida.cpp
     Source/PadelSim/Private/PassoFixo.cpp
     Source/PadelSim/Private/Placar.cpp
@@ -28,9 +29,10 @@ endif()
 
 enable_testing()
 # Um executável por área, todos contra o gabarito do Padel.Core.
-foreach(teste TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro)
+foreach(teste TestesDaMatematica TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro)
     add_executable(${teste} Testes/PadelSim/${teste}.cpp)
     target_link_libraries(${teste} PRIVATE PadelSim)
-    target_compile_definitions(${teste} PRIVATE PASTA_DO_GABARITO="${CMAKE_CURRENT_SOURCE_DIR}/Testes/PadelSim/Gabarito")
+    target_compile_definitions(${teste} PRIVATE PASTA_DO_GABARITO="${CMAKE_CURRENT_SOURCE_DIR}/Testes/PadelSim/Gabarito"
+                                              PASTA_DO_MOTOR="${CMAKE_CURRENT_SOURCE_DIR}/Source/PadelSim/Private")
     add_test(NAME ${teste} COMMAND ${teste})
 endforeach()

@@ -29,3 +29,4 @@ O gabarito é a verdade: trajetórias, golpes, golpes especiais, partidas inteir
 | `GabaritoDaPartida.cs` | `partidas.csv`, `partidas-retratos.csv`, `partidas-eventos.csv` |
 | `GabaritoDoPassoFixo.cs` | `passo-fixo.csv` |
 | `GabaritoDoPlacarEDoArbitro.cs` | `placar.csv`, `arbitro.csv` |
+| `GabaritoDaMatematica.cs` | `matematica.csv` (as funções sem libm, em bits) |

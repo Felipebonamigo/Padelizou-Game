@@ -11,7 +11,7 @@ public:
     explicit Aleatorio(uint32_t semente);
     /// Número em [0, 1).
     float Proximo();
-    /// Box-Muller: média 0, desvio 1. Usa logf e cosf: o resultado depende da libm da plataforma (ver CLAUDE.md).
+    /// Box-Muller: média 0, desvio 1. Log e cosseno de padel::mat (sem libm).
     float Gaussiana();
 
 private:

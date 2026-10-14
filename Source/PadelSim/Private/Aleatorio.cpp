@@ -1,5 +1,7 @@
 #include "PadelSim/Aleatorio.h"
 
+#include "PadelSim/Matematica.h"
+
 #include <cmath>
 
 namespace padel
@@ -21,6 +23,6 @@ float Aleatorio::Gaussiana()
     float u = 0, v = 0;
     while (u == 0) u = Proximo();
     while (v == 0) v = Proximo();
-    return std::sqrt(-2 * std::log(u)) * std::cos(2 * Pi * v);
+    return std::sqrt(-2 * mat::Log(u)) * mat::Cosseno(2 * Pi * v);   // sem libm: os mesmos bits em qualquer máquina
 }
 } // namespace padel

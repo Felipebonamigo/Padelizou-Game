@@ -10,14 +10,11 @@ as paredes como estrela, visual de transmissão. Estúdio de uma pessoa (Felipe)
 2. **Nada é enviado com teste vermelho.** Fora do Unreal: o comando de "Rodar" abaixo. No Unreal: a Automation Spec.
 3. **Uma coisa de cada vez, até o fim.** Fechou um trabalho: commit + push.
 4. **Três correções seguidas falhando: pare e questione a arquitetura.** Volte à causa raiz.
-5. **O motor reproduz o gabarito bit a bit.** Nada de FMA nem fast-math (`CMakeLists.txt`). A física da bola só usa
-   soma, multiplicação, divisão e raiz, e sai igual em gcc, clang e MSVC. **Exceção conhecida:** a IA (sorteio
-   gaussiano: `logf`, `cosf`) e os golpes especiais (`sinf`, `cosf`, `expf`, `powf`, `atan2f`) dependem da libm, que
-   muda de bits entre glibc e a UCRT da Microsoft — e entre versões da glibc. Por isso o CI de Linux é fixo na
-   ubuntu-24.04 (glibc 2.39, a do gabarito) e, no MSVC, só a bola e o `PassoFixo` bloqueiam. Não afeta o jogo online
-   (o Unreal replica do servidor, não roda em lockstep); afeta a prova no Windows. A saída é o `Padel.Core` trocar
-   essas funções por versões próprias, sem libm (decisão pendente em `docs/estado-atual.md`). Função da libm nova
-   no motor: só com essa decisão tomada.
+5. **O motor reproduz o gabarito bit a bit, em qualquer máquina.** Nada de FMA nem fast-math (`CMakeLists.txt`) e
+   **nada de libm**: seno, cosseno, arco-tangente, exponencial, logaritmo e potência saem de `padel::mat`
+   (`Matematica.cpp`, porte de `MatematicaDeterministica.cs` do Core), que só usa soma, multiplicação, divisão, raiz,
+   floor e bits. O `TestesDaMatematica` confere essas funções bit a bit e barra `std::sin` & cia. nos arquivos do
+   motor (o Core tem o mesmo portão). Resultado: o CI exige os mesmos bits em gcc, clang e MSVC.
 
 ## A física e o gabarito
 
