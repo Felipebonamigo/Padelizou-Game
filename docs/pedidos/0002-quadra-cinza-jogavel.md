@@ -35,7 +35,8 @@ câmera de TV, drive, lob e saque, e o placar.**
 7. **Modo de golpe:** opção no menu de debug entre `Manual` (o timing é seu) e `Automatico` (bate sozinho), que é o
    "Casual" do design.
 8. **Placar de TV** mínimo (UMG): pontos com `Placar.TextoDosPontos(time)`, games e sets, a `Mensagem` da partida
-   quando houver. Fim de partida: tela com `Placar.Resumo()` e "jogar de novo".
+   quando houver. Fim de partida: tela com `Placar.Resumo()` e "jogar de novo". A partida da fatia é o **formato
+   curto** do design: `OpcoesDaPartida{ .GamesPorSet = 4, .PontosDoTieBreak = 10 }` (set até 4, super tie-break a 10).
 9. **Eventos:** ligue `partida.AoEvento` a um log na tela por 2 s (Golpe com o tipo, Quique, Parede, Ponto e motivo).
    Serve de depuração agora e de gancho do som e da animação depois.
 10. **Prova:** jogue uma partida inteira no Manual contra o Médio e outra no Automático. Cole o placar final e salve duas

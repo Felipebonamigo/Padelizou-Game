@@ -5,9 +5,11 @@
 
 namespace padel
 {
-Placar::Placar(bool pontoDeOuro, int32_t setsParaVencer, int32_t timeQueSaca)
-    : PontoDeOuro(pontoDeOuro), SetsParaVencer(setsParaVencer), SacadorDoGame(timeQueSaca)
+Placar::Placar(bool pontoDeOuro, int32_t setsParaVencer, int32_t timeQueSaca, int32_t gamesPorSet, int32_t pontosDoTieBreak)
+    : PontoDeOuro(pontoDeOuro), SetsParaVencer(setsParaVencer), GamesPorSet(gamesPorSet), PontosDoTieBreak(pontosDoTieBreak), SacadorDoGame(timeQueSaca)
 {
+    if (gamesPorSet < 1) throw std::out_of_range("gamesPorSet");
+    if (pontosDoTieBreak < 1) throw std::out_of_range("pontosDoTieBreak");
     AbrirTurnoDeSaque(timeQueSaca);
 }
 
@@ -49,7 +51,7 @@ EventoDoPlacar Placar::PontoPara(int32_t time)
     int32_t a = Pontos[time], b = Pontos[1 - time];
     if (EmTieBreak)
     {
-        if (a >= 7 && a - b >= 2) return FecharGame(time);
+        if (a >= PontosDoTieBreak && a - b >= 2) return FecharGame(time);
         RodarSaqueNoTieBreak();
         return {TipoDeEventoDoPlacar::Ponto, time};
     }
@@ -91,13 +93,13 @@ EventoDoPlacar Placar::FecharGame(int32_t time)
     EmTieBreak = false;
     int32_t g = Games[time], h = Games[1 - time];
     EventoDoPlacar evento;
-    if (eraTieBreak || (g >= 6 && g - h >= 2))
+    if (eraTieBreak || (g >= GamesPorSet && g - h >= 2))
     {
         evento = FecharSet(time, pontosDoTieBreak);
     }
     else
     {
-        if (g == 6 && h == 6) EmTieBreak = true;
+        if (g == GamesPorSet && h == GamesPorSet) EmTieBreak = true;
         evento = {TipoDeEventoDoPlacar::Game, time};
     }
     // Próximo game: o outro time saca. Depois do tie-break, saca quem NÃO abriu o tie-break.

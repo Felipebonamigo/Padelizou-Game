@@ -2,6 +2,16 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 14/10/2026 (noite, 2) — formato curto: set até 4 games, super tie-break a 10
+
+- Pilar 3 do design (partida de 4 a 6 minutos). No `Padel.Core` (`73871f4`): `Placar.GamesPorSet` (padrão 6) e
+  `Placar.PontosDoTieBreak` (padrão 7), e as mesmas opções na `OpcoesDaPartida`. Formato curto = 4 e 10: fecha em 4-2
+  ou 5-3; em 4-4, super tie-break a 10 por 2. Fora do padrão não vale online no Arena (o protocolo dele só carrega
+  ponto de ouro e sets). 9 testes novos no Core, vistos falhar; Core 658 verdes; Arena verde.
+- Gabarito: +4 placares curtos e +1 partida curta (humano Avançado × Médio, manual: 4-1). C++ igual: 0 falhas nos 6
+  testes, gcc e clang.
+- Para o Unreal: a partida da fatia usa `GamesPorSet = 4`, `PontosDoTieBreak = 10` (pedido 0002, passo 8).
+
 ## 14/10/2026 (noite) — motor sem libm: os mesmos bits no Linux e no Windows
 
 **Feito** (decisão do Felipe: "sim, faça a troca no Core")

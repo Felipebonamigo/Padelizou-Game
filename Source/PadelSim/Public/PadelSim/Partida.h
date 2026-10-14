@@ -59,6 +59,10 @@ struct OpcoesDaPartida
     padel::Dificuldade Dificuldade = padel::Dificuldade::Medio;
     bool PontoDeOuro = true;
     int32_t SetsParaVencer = 1;
+    /// Games pra fechar o set; o empate vai ao tie-break. O formato curto da fatia é 4 (Placar::GamesPorSet).
+    int32_t GamesPorSet = 6;
+    /// Pontos do tie-break; o super tie-break do formato curto é 10.
+    int32_t PontosDoTieBreak = 7;
     /// Por jogador (time*2 + índice): quem é humano. Padrão: só o da casa, metade direita.
     std::array<bool, 4> Humanos{true, false, false, false};
     padel::ModoDeGolpe ModoDeGolpe = padel::ModoDeGolpe::Manual;

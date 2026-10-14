@@ -62,7 +62,7 @@ const char* Partida::TextoDoMotivo(padel::Motivo motivo)
 
 Partida::Partida(OpcoesDaPartida opcoes)
     : Opcoes(opcoes), Aleatorio(opcoes.Semente ? *opcoes.Semente : SementeAleatoria()),
-      Placar(opcoes.PontosCorridos ? padel::Placar::DePontosCorridos(*opcoes.PontosCorridos, 0) : padel::Placar(opcoes.PontoDeOuro, opcoes.SetsParaVencer, 0))
+      Placar(opcoes.PontosCorridos ? padel::Placar::DePontosCorridos(*opcoes.PontosCorridos, 0) : padel::Placar(opcoes.PontoDeOuro, opcoes.SetsParaVencer, 0, opcoes.GamesPorSet, opcoes.PontosDoTieBreak))
 {
     const PerfilDeIA& rival = perfis::Por(Opcoes.Dificuldade);
     const auto& h = Opcoes.Humanos;

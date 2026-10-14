@@ -1,5 +1,6 @@
 // Placar e árbitro contra o gabarito (Gabarito/placar.csv e arbitro.csv, de GabaritoDoPlacarEDoArbitro.cs): o que as
-// partidas não alcançam — tie-break, vários sets, vantagem longa, empate nos pontos corridos, falta, let, dupla falta.
+// partidas não alcançam — tie-break, vários sets, vantagem longa, empate nos pontos corridos, formato curto (set de 4,
+// super tie-break a 10), falta, let, dupla falta.
 #include "PadelSim/Arbitro.h"
 #include "PadelSim/Placar.h"
 #include "PadelSim/Quadra.h"
@@ -64,9 +65,9 @@ void TestePlacar()
         if (!p)
         {
             int corridos = I(l[3]);
-            p = corridos >= 0 ? Placar::DePontosCorridos(corridos, I(l[4])) : Placar(l[1] == "1", I(l[2]), I(l[4]));
+            p = corridos >= 0 ? Placar::DePontosCorridos(corridos, I(l[4])) : Placar(l[1] == "1", I(l[2]), I(l[4]), I(l[5]), I(l[6]));
         }
-        EventoDoPlacar ev = p->PontoPara(I(l[6]));
+        EventoDoPlacar ev = p->PontoPara(I(l[8]));
         auto s = p->SacadorAtual();
         std::vector<std::string> obtido{
             std::to_string((int)ev.Tipo), std::to_string(ev.Time), std::to_string(p->Pontos[0]), std::to_string(p->Pontos[1]),
@@ -75,8 +76,8 @@ void TestePlacar()
             std::to_string((int)p->LadoDoSaqueAtual()), B(p->EmPontoDecisivo()), p->TextoDosPontos(0), p->TextoDosPontos(1), p->Resumo()};
         std::string diferenca;
         for (size_t i = 0; i < obtido.size(); i++)
-            if (obtido[i] != l[7 + i]) diferenca += "campo " + std::to_string(7 + i) + ": esperado '" + l[7 + i] + "', obtido '" + obtido[i] + "'; ";
-        Conferir(diferenca.empty(), "placar " + l[0] + ", ponto " + l[5] + ": " + diferenca);
+            if (obtido[i] != l[9 + i]) diferenca += "campo " + std::to_string(9 + i) + ": esperado '" + l[9 + i] + "', obtido '" + obtido[i] + "'; ";
+        Conferir(diferenca.empty(), "placar " + l[0] + ", ponto " + l[7] + ": " + diferenca);
     }
 }
 

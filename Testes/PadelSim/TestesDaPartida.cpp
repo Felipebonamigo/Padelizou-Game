@@ -126,12 +126,14 @@ int main()
         o.Dificuldade = static_cast<Dificuldade>(std::atoi(c[2].c_str()));
         o.PontoDeOuro = c[3] == "1";
         o.SetsParaVencer = std::atoi(c[4].c_str());
-        bool temHumano = c[5] == "1";
+        o.GamesPorSet = std::atoi(c[5].c_str());
+        o.PontosDoTieBreak = std::atoi(c[6].c_str());
+        bool temHumano = c[7] == "1";
         o.Humanos = temHumano ? std::array<bool, 4>{true, false, false, false} : OpcoesDaPartida::NinguemHumano;
-        o.ModoDeGolpe = static_cast<ModoDeGolpe>(std::atoi(c[7].c_str()));
-        o.Semente = static_cast<uint32_t>(std::strtoul(c[8].c_str(), nullptr, 10));
-        if (std::atoi(c[9].c_str()) >= 0) o.PontosCorridos = std::atoi(c[9].c_str());
-        const int passosEsperados = std::atoi(c[10].c_str());
+        o.ModoDeGolpe = static_cast<ModoDeGolpe>(std::atoi(c[9].c_str()));
+        o.Semente = static_cast<uint32_t>(std::strtoul(c[10].c_str(), nullptr, 10));
+        if (std::atoi(c[11].c_str()) >= 0) o.PontosCorridos = std::atoi(c[11].c_str());
+        const int passosEsperados = std::atoi(c[12].c_str());
 
         int passo = 0;
         int falhasDaPartida = 0;
@@ -164,7 +166,7 @@ int main()
         if (temHumano)
         {
             aleatorioDoHumano.emplace(*o.Semente + 1000);
-            humano.emplace(0, PerfilPeloNome(c[6]), *aleatorioDoHumano);
+            humano.emplace(0, PerfilPeloNome(c[8]), *aleatorioDoHumano);
         }
         std::array<Entrada, 4> entradas{};
 
@@ -185,10 +187,10 @@ int main()
         ++verificacoes;
         char resumo[300];
         std::snprintf(resumo, sizeof resumo, "fim: %d passos e \"%s\" (esperado %d e \"%s\"); %zu de %zu eventos, %zu de %zu retratos",
-                      passo, p.Placar.Resumo().c_str(), passosEsperados, c[11].c_str(), proximoEvento, evEsperados.size(), proximoRetrato, retEsperados.size());
-        bool fimOk = passo == passosEsperados && p.Placar.Resumo() == c[11] && proximoEvento == evEsperados.size() && proximoRetrato == retEsperados.size() &&
-                     p.Estatisticas.Pontos == std::atoi(c[14].c_str()) && p.Estatisticas.Golpes == std::atoi(c[15].c_str()) &&
-                     p.Estatisticas.MaiorRally == std::atoi(c[16].c_str()) && p.Estatisticas.Faltas == std::atoi(c[17].c_str()) && p.Estatisticas.Lets == std::atoi(c[18].c_str());
+                      passo, p.Placar.Resumo().c_str(), passosEsperados, c[13].c_str(), proximoEvento, evEsperados.size(), proximoRetrato, retEsperados.size());
+        bool fimOk = passo == passosEsperados && p.Placar.Resumo() == c[13] && proximoEvento == evEsperados.size() && proximoRetrato == retEsperados.size() &&
+                     p.Estatisticas.Pontos == std::atoi(c[16].c_str()) && p.Estatisticas.Golpes == std::atoi(c[17].c_str()) &&
+                     p.Estatisticas.MaiorRally == std::atoi(c[18].c_str()) && p.Estatisticas.Faltas == std::atoi(c[19].c_str()) && p.Estatisticas.Lets == std::atoi(c[20].c_str());
         if (!fimOk) Falhar(resumo);
         std::printf("partida %d (%s): %s\n", id, nome.c_str(), falhasDaPartida == 0 ? "igual ao Padel.Core" : "DIFERENTE");
     }
