@@ -144,6 +144,9 @@ public:
 
     /// Índice (time*2 + índice) de quem está indo buscar a bola, se houver.
     std::optional<int32_t> Responsavel() const;
+    /// Onde o corpo de j tem de ficar pra bater a bola do plano no ponto ideal, se é ele que vai nela: ao lado do x de
+    /// verdade da bola, na profundidade de verdade (sem o erro de leitura). O alvo do movimento assistido do humano.
+    std::optional<std::pair<float, float>> AlvoDoCorpo(const Jogador& j) const;
     void AoSacar(Partida& partida, int32_t timeSacador);
     void AoGolpear(Partida& partida, const Golpe& golpe, const Jogador& jogador);
     void AoRebater(Partida& partida);
@@ -155,6 +158,7 @@ private:
     {
         Jogador* Responsavel = nullptr;
         float AlvoY = 0, AlvoT = 0, CriadoEm = 0, PlanejadoEm = 0, XDaBola = 0, RuidoX = 0;
+        float YDaBola = 0;   // y de verdade da bola no ponto escolhido (o AlvoY é a leitura, com erro)
         LadoDoGolpe Lado = LadoDoGolpe::Drive;
     };
     struct Candidato

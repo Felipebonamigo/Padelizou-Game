@@ -141,6 +141,7 @@ int main()
         if (std::atoi(c[11].c_str()) >= 0) o.PontosCorridos = std::atoi(c[11].c_str());
         o.Controle = static_cast<Controle>(std::atoi(c[21].c_str()));
         o.Assistencia = static_cast<Assistencia>(std::atoi(c[22].c_str()));
+        const bool soBotao = c[23] == "1";
         const int passosEsperados = std::atoi(c[12].c_str());
 
         int passo = 0;
@@ -188,7 +189,11 @@ int main()
         while (!p.Acabou() && passo < 120 * 60 * 40 && falhasDaPartida < 5)
         {
             passo++;
-            if (humano) entradas[0] = humano->Decidir(EstadoVisivel::De(p), Passo);
+            if (humano)
+            {
+                entradas[0] = humano->Decidir(EstadoVisivel::De(p), Passo);
+                if (soBotao) { entradas[0].Dx = 0; entradas[0].Dy = 0; }   // o analógico solto: só aperta botão
+            }
             p.Avancar(Passo, entradas.data());
             if (passo % PassosPorRetrato == 0 || p.Acabou()) ConferirRetrato();
         }

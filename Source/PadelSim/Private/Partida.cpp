@@ -222,7 +222,8 @@ void Partida::Rally(float dt)
     {
         if (!j.Humano) continue;
         const Entrada& e = EntradaDe(j);
-        j.Mover(e.Dx * j.Lado, e.Dy * j.Lado, dt);   // do referencial do jogador pro mundo
+        if (auto alvo = AlvoDaAssistencia(j, e)) j.IrPara(alvo->first, alvo->second, dt);
+        else j.Mover(e.Dx * j.Lado, e.Dy * j.Lado, dt);   // do referencial do jogador pro mundo
         if (!manual) continue;
         if (j.BalancoTerminouNoAr())
         {
@@ -325,6 +326,18 @@ std::optional<IntencaoDoGolpe> Partida::IntencaoDoAperto(const Entrada& e) const
     }
     if (e.AcaoPressionada) return IntencaoDoGolpe::Chapado;
     return std::nullopt;
+}
+
+/// O movimento assistido: com o analógico solto, o humano que a IA do time mandou na bola anda sozinho até o ponto de
+/// contato — no Casual de onde estiver, no Padrão só dentro de RaioDoAjusteFinal. O analógico mexido manda; no Pro, nada.
+std::optional<std::pair<float, float>> Partida::AlvoDaAssistencia(const Jogador& j, const Entrada& e) const
+{
+    if (j.Assistencia == padel::Assistencia::Pro) return std::nullopt;
+    if (std::fabs(e.Dx) >= ZonaMortaDoAnalogico || std::fabs(e.Dy) >= ZonaMortaDoAnalogico) return std::nullopt;
+    auto alvo = IAs[j.Time].AlvoDoCorpo(j);
+    if (!alvo) return std::nullopt;
+    if (j.Assistencia == padel::Assistencia::Padrao && mat::Distancia(j.X, j.Y, alvo->first, alvo->second) > RaioDoAjusteFinal) return std::nullopt;
+    return alvo;
 }
 
 Golpe Partida::GolpeDoHumano(Jogador& jogador, const Entrada& entrada)

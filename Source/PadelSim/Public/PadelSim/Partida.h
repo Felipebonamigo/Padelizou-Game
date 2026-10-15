@@ -98,6 +98,10 @@ public:
 
     /// Constante, como no C#: trocar o modo de golpe ou o controle depois de criar furaria a recusa do construtor.
     const OpcoesDaPartida Opcoes;
+    /// Abaixo disto em cada eixo, o analógico está solto e o movimento assistido pode agir.
+    static constexpr float ZonaMortaDoAnalogico = 0.2f;
+    /// No Padrão, o movimento assistido só faz o ajuste final: com o corpo a até 1 m do ponto.
+    static constexpr float RaioDoAjusteFinal = 1.0f;
     padel::Aleatorio Aleatorio;
     padel::Placar Placar;
     padel::Arbitro Arbitro;
@@ -137,6 +141,7 @@ private:
     void FixarNoPontoDeSaida();
     void Golpear(Jogador& jogador);
     std::optional<IntencaoDoGolpe> IntencaoDoAperto(const Entrada& e) const;
+    std::optional<std::pair<float, float>> AlvoDaAssistencia(const Jogador& j, const Entrada& e) const;
     Golpe GolpeDoHumano(Jogador& jogador, const Entrada& entrada);
     Golpe EscolherGolpeDoHumano(Jogador& jogador, const Entrada& entrada);
     void Decidir(const Decisao& decisao);

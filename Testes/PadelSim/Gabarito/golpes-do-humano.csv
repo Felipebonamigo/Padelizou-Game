@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em d781e64
+# gabarito do Padel.Core em 4733b73
 id,semente,nome,alta,jy,botoes,seguraA,seguraY,rb,dx,dy,assistencia,adiantamento,tipo,passo,vx,vy,vz,wx,wy,wz,erro
 0,21,baixa; A segurado,0,8,A,1,0,0,0,0,0,0,2,34,-3.1423728,-19.591463,2.9219575,227.47595,-36.486034,0,0.23300533
 1,21,alta; A segurado,1,2.5,A,1,0,0,0,0,0,0,2,42,-3.46092,-13.019949,-1.5479035,222.65161,-59.18452,0,0

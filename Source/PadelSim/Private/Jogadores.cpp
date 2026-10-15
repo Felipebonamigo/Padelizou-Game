@@ -242,6 +242,12 @@ Jogador* ParceiroDe(const std::array<Jogador*, 2>& meus, const Jogador& j) { ret
 
 IA::IA(int32_t time, const PerfilDeIA& perfil, Aleatorio& a) : Time(time), Perfil(perfil), aleatorio(&a) {}
 
+std::optional<std::pair<float, float>> IA::AlvoDoCorpo(const Jogador& j) const
+{
+    if (!plano || plano->Responsavel != &j) return std::nullopt;
+    return std::make_pair(mat::Limitar(j.XParaBater(plano->XDaBola, plano->Lado), -4.7f, 4.7f), plano->YDaBola);
+}
+
 std::optional<int32_t> IA::Responsavel() const
 {
     if (plano && plano->Responsavel) return plano->Responsavel->Time * 2 + plano->Responsavel->Indice;
@@ -358,6 +364,7 @@ void IA::Planejar(Partida& partida, bool novaTrajetoria)
     novo.CriadoEm = novaTrajetoria || !planoAnterior ? relogio : planoAnterior->CriadoEm;
     novo.PlanejadoEm = relogio;
     novo.XDaBola = alvo.X;
+    novo.YDaBola = alvo.Y;
     novo.RuidoX = ruidoX;
     plano = novo;
     // A bola vai passar por cima da dupla na rede (quem vai nela vai buscá-la atrás da linha de saque): recuam juntos.

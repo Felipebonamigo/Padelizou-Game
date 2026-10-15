@@ -2,6 +2,17 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 15/10/2026 (4) — assistência, parte 2: o movimento assistido
+
+- Com o analógico solto, o humano que a IA do time mandou na bola anda sozinho até o ponto de contato (`IA::AlvoDoCorpo`:
+  ao lado do x de verdade da bola, sem o erro de leitura) — no Casual de onde estiver, no Padrão só a menos de 1 m. O
+  analógico mexido manda; no Pro, nada. Core `4733b73`.
+- Medido contra a Médio, formato curto: o Iniciante que só aperta botão faz 51,6 % dos pontos (58 % das partidas) no
+  Casual, contra 21,5 % (0 %) no Pro. Tabela e as duas perguntas que isso levanta (o analógico desligar a ajuda; a
+  ajuda ler a bola sem erro) no `docs/ASSISTENCIA.md`.
+- Gabarito: partida 11 (Iniciante só no botão, Casual). Sem o porte, as partidas 9, 10 e 11 reprovaram; portado, 8
+  testes verdes em gcc e clang (partidas: 21.969 verificações). Falta a parte 3: o RB mirando a saída de parede.
+
 ## 15/10/2026 (3) — janela do timing e os achados da revisão adversarial
 
 - **Assistência, parte 1 (janela do timing):** `Assistencia { Pro, Padrao, Casual }`, de cada jogador e trocável a
