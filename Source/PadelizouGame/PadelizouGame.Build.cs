@@ -6,6 +6,7 @@ public class PadelizouGame : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore" });
         // O motor da física, do golpe e do placar: o Unreal só desenha e lê o controle.
         PublicDependencyModuleNames.Add("PadelSim");
     }

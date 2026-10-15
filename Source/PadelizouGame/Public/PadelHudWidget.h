@@ -1,0 +1,30 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "PadelHudWidget.generated.h"
+
+class UBorder;
+class UTextBlock;
+
+// Placar de TV mínimo, montado em C++ (sem Blueprint): placar, mensagem da partida, log de eventos, modo de golpe e a
+// tela de fim de partida.
+UCLASS()
+class PADELIZOUGAME_API UPadelHudWidget : public UUserWidget
+{
+    GENERATED_BODY()
+
+public:
+    virtual bool Initialize() override;
+
+    void Atualizar(const FText& Placar, const FText& Mensagem, const FText& Eventos, const FText& Modo);
+    void MostrarFim(bool bMostrar, const FText& Resumo);
+
+private:
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> TextoDoPlacar;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> TextoDaMensagem;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> TextoDosEventos;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> TextoDoModo;
+    UPROPERTY(Transient) TObjectPtr<UTextBlock> TextoDoFim;
+    UPROPERTY(Transient) TObjectPtr<UBorder> TelaDoFim;
+};

@@ -56,4 +56,74 @@ Arte, MetaHumans, animação, som, menus de verdade, online. Nenhuma mudança de
 
 ## Resposta da sessão local
 
-(vazio)
+Respondido em 15/10/2026, sessão local do PC. **DONE_WITH_CONCERNS** — ressalvas em "O que ficou diferente".
+
+### O que ficou pronto
+
+Mapa `/Game/Mapas/QuadraCinza` (o padrão do projeto). Tudo nasce de um ator, `APadelPartidaAtor`:
+
+| Item do pedido | Onde |
+|---|---|
+| 1. Ator dono da `Partida` + `PassoFixo(120)` | `FPadelSimulacao` (`PadelSimulacao.h/.cpp`): `n = passo.Quadro(...)`, `Avancar(1/120)` por passo, `EntradaDoPasso(i)` no jogador 0. O ator só chama `Quadro()` (quadro lento limitado a 0,25 s). |
+| 2. Coordenadas num lugar só | `Coordenadas.h` (pedido 0001). Todo ator lê por ali. |
+| 3. Quadra cinza | Piso 20×10 m, linhas de 5 cm (fundo, laterais, saque a 6,95 m, central), rede de 0,90 m e paredes **todas de `quadra::Paineis()`** (`PadelPaineis.h`): vidro semitransparente (`M_Vidro`) e grade cinza escuro. Nenhuma medida de parede à mão. |
+| 4. Quatro cápsulas, raquete, anel, bola | Cilindro + cabeça por jogador (azul = casa, vermelho = rival), nariz mostra a frente, disco como raquete que varre no balanço, anel amarelo no jogador 0, bola amarela com sombra. Posições de `partida.Jogadores[i]`. |
+| 5. Câmera de TV | FOV horizontal 54°, 7,5 m de altura, 17,5 m atrás da linha de fundo da casa, olha o centro; segue a bola só no eixo lateral (55 % do x, atraso suave de 0,45 s). |
+| 6. Controle (Enhanced Input) | `UInputAction`/`UInputMappingContext` criados em C++: WASD/analógico, A/Espaço, B/Shift, X/Q, Y/E, RB/Ctrl, teclado e controle. `OpcoesDaPartida{ .Controle = QuatroBotoes }`. `PadelControle.h` monta a `Entrada` no referencial do jogador. |
+| 7. Modo de golpe | **F2** troca Manual (4 botões) ↔ Automático (2 botões) **na próxima partida** (a `Partida` é nova: `Opcoes` é `const`); **F3** troca a assistência (Pro/Padrão/Casual) direto no jogador, na hora. |
+| 8. Placar de TV (UMG) | `UPadelHudWidget`, montado em C++: pontos (`TextoDosPontos`), games e sets, bolinha no sacador, `Mensagem` da partida, "SUPER TIE-BREAK", tela de fim com `Placar.Resumo()` e "R / Start: jogar de novo". Formato curto: `GamesPorSet = 4`, `PontosDoTieBreak = 10`. |
+| 9. Eventos | `AoEvento` vira log na tela por 2 s (golpe com o tipo, quique, parede, ponto e motivo, falta, let, game, set, partida). |
+
+### Testes (escritos antes, vistos falhar)
+
+`PadelizouGame.Casca`, 8 testes (falhou por "header não existe"; depois por tolerância de 1e-6 cm em `float`, corrigida):
+60 quadros de 1/60 s = 120 passos; quadro lento de 0,5 s = 60 passos; quadros irregulares sem deriva (1 s = 120 passos); partida inteira
+IA×IA do formato curto termina e dá o mesmo placar e os mesmos passos com a mesma semente; cada painel de `Paineis()` vira caixa
+por fora da parede certa; W+D = `Dx > 0, Dy < 0` e diagonal ≤ 1; A/B/X/Y/RB nos campos certos; solto não manda nada.
+
+Tudo junto, no mesmo turno desta resposta: `ctest` MSVC **8/8**; `Automation RunTests PadelSim+PadelizouGame` → **19 de 19 `Success`,
+`EXIT CODE: 0`** (8 do gabarito, 3 da fumaça, 8 da casca).
+
+### Prova de partida (item 10)
+
+Rodei com render (RTX 4070 Ti, 1280×720, `-benchmark -fps=60` para passo de 1/60 s) e semente 42, contra a IA **Médio**, formato curto:
+
+```
+UnrealEditor.exe PadelizouGame.uproject /Game/Mapas/QuadraCinza -game -windowed -ResX=1280 -ResY=720 -benchmark -fps=60 \
+  -PadelHumanoSimulado -PadelCapturas -PadelSairNoFim -PadelSemente=42 [-PadelModo=auto]
+```
+
+| Modo | Placar final | Tempo de jogo | Tick do ator |
+|---|---|---|---|
+| Manual, 4 botões | **5-4(2)**, a casa venceu (set 4-4 e super tie-break) | 711,0 s (42.628 quadros medidos) | média **0,047 ms**, máximo 0,865 ms |
+| Automático, 2 botões | **4-0**, a casa venceu | 326,5 s (19.594 quadros) | média **0,046 ms**, máximo 0,724 ms |
+
+Meta (< 1 ms por quadro): cumprida. O Manual repete com a mesma semente (5-4(2) e 711,0 s nas duas rodadas). Na 1ª rodada, com cache de shader frio,
+o máximo foi 1,462 ms (quadros de compilação).
+Capturas em `docs/imagens/` (LFS): `rally-manual.png`, `fim-manual.png`, `rally-automatico.png`, `fim-automatico.png`.
+
+**Controle de verdade:** com `-PadelTesteDeEntrada` o ator injeta teclas no `PlayerInput` e loga a `Entrada` que o Enhanced Input entrega.
+Resultado: W+D → `Dx=0.71 Dy=-0.71`; Espaço → `A=1 Aseg=1` (um quadro de aperto; segurado até soltar); Shift → `B=1`; E → `Y=1 Yseg=1` (segura até soltar);
+Ctrl → `RB=1`; Q → `X=1`; soltar zera tudo.
+
+### O que ficou diferente do pedido e por quê
+
+1. **Quem jogou as partidas da prova foi o `padel::HumanoSimulado` (perfil Avançado), não um humano de mãos.** Sem a mão do Felipe eu não consigo
+   apertar botão no tempo. É a mesma `Entrada` do controle (`-PadelHumanoSimulado`), então exercita casca, câmera, HUD, placar e medição, mas **não**
+   o "sentir" do controle. O teclado foi provado por injeção de tecla (acima); o **controle físico (gamepad) não foi testado**, só mapeado com os mesmos
+   botões. Falta o Felipe jogar com a mão e dizer como está.
+2. **Medição:** `FPlatformTime` dentro do `Tick` do ator (simulação + desenho + HUD), ignorando os 180 primeiros quadros, não `stat game`/Insights.
+3. **Bola 2,5× maior no visual** (`EscalaVisualDaBola`, padrão 2,5; `1` dá os 6,7 cm reais): a 27 m da câmera a bola real tem ~3 px e some.
+4. **"Jogar de novo" e o menu de debug são teclas** (R/Start; F2 modo; F3 assistência), não botões clicáveis de UMG. Menu de verdade fica para a etapa de arte.
+5. **Materiais, mapa e GameMode:** `M_Cor`/`M_Vidro` e os mapas saem de `Ferramentas/*.py` (reproduzíveis). `APadelGameMode` não tem pawn.
+6. **Alvo Game não compilado** (só Editor), como no 0001; os dois editores abertos continuam bloqueando o build normal (`-NoHotReloadFromIDE`).
+7. **Visual a melhorar depois (não regra):** a faixa de grade escura da parede de fundo da casa cobre parte dos jogadores de perto; as cápsulas são cilindros.
+   Nenhum defeito do motor encontrado: placar, tie-break, árbitro e IA se comportaram como o gabarito.
+
+### Como abrir e jogar a quadra cinza
+
+1. Duplo clique em `PadelizouGame.uproject` (Unreal 5.8; o mapa padrão já é `QuadraCinza`). Aguarde "Compiling shaders" na 1ª vez.
+2. **Play** (Alt+P). Você é o azul com o anel amarelo, contra o Médio.
+3. Controle: **WASD** ou analógico esquerdo; **Espaço/A** saca e bate (chapado; segurado = ataque); **Shift/B** lob; **Q/X** cortado; **E/Y** ataque/smash;
+   **Ctrl/RB** modificador; **F2** troca Manual ↔ Automático na próxima partida; **F3** assistência; **R/Start** jogar de novo.
+4. Sem editor, partida simulada: o comando da seção "Prova de partida" acima.
