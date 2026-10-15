@@ -1,6 +1,8 @@
 // Jogador (posição, inércia, alcance, balanço) e IA (Padel.Core/Jogadores.cs).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Aleatorio.h"
 #include "PadelSim/Bola.h"
 #include "PadelSim/Golpe.h"
@@ -21,7 +23,7 @@ class Partida;
 /// quem não bateu demora pra acompanhar a dupla e a bola; AcompanhamentoDaBola (0 a 1) — quanto o centro da dupla segue o
 /// x da bola; SeparacaoDaDupla (m); FolgaDoBloco (m) — a maior diferença de profundidade aceita do parceiro;
 /// ChanceDeDesencontro (0 a 1) — em cada mudança, a chance de quem não bateu nem perceber.
-struct PerfilDeIA
+struct PADELSIM_API PerfilDeIA
 {
     float Velocidade, Reacao, ErroDeMira, ErroDePrevisao, ChanceDeErro, ChanceDeLob, ChanceDeRemateParaFora = 0;
     float AtrasoDaFormacao = 0.35f, AcompanhamentoDaBola = 0.35f, SeparacaoDaDupla = 4.0f, FolgaDoBloco = 1.0f, ChanceDeDesencontro = 0;
@@ -34,15 +36,15 @@ inline constexpr PerfilDeIA Medio{5.6f, 0.25f, 0.9f, 0.7f, 0.07f, 0.3f, 0.15f, 0
 inline constexpr PerfilDeIA Dificil{6.6f, 0.10f, 0.5f, 0.35f, 0.025f, 0.35f, 0.30f, 0.10f, 0.5f, 3.6f, 0.5f, 0};
 /// O parceiro do humano: confiável sem ser um muro.
 inline constexpr PerfilDeIA Parceiro{5.8f, 0.18f, 0.8f, 0.55f, 0.04f, 0.3f, 0.15f, 0.2f, 0.4f, 3.8f, 0.8f, 0};
-const PerfilDeIA& Por(Dificuldade d);
+PADELSIM_API const PerfilDeIA& Por(Dificuldade d);
 } // namespace perfis
 
 /// Meia largura (s) da janela do timing em volta do momento ideal do balanço: Pro 0, Padrão ±20 ms, Casual ±40 ms
 /// (Partida.JanelaDoContato no Padel.Core; o porquê dos números está lá).
-float JanelaDoContato(Assistencia nivel);
+PADELSIM_API float JanelaDoContato(Assistencia nivel);
 
 /// Posição, velocidade com inércia (acelera e freia como gente), alcance e o balanço da raquete.
-class Jogador
+class PADELSIM_API Jogador
 {
 public:
     static constexpr float VelocidadeDoHumano = 6.4f;
@@ -129,7 +131,7 @@ private:
 /// (com erro de leitura que afina enquanto a bola chega), e escolhe o golpe. Quem não vai na bola joga em formação: os
 /// dois andam como um bloco na profundidade (rede ou fundo, subindo e recuando juntos) e na largura (o centro segue a
 /// bola; o "cambio" cobre o lado vazio). O parceiro IA de um humano segue a formação do humano. Detalhes no C#.
-class IA
+class PADELSIM_API IA
 {
 public:
     static constexpr float ProfundidadeDaRede = 3.2f;

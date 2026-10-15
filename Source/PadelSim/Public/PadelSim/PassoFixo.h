@@ -6,11 +6,13 @@
 //   quadro com vários passos, só o primeiro leva o aperto. Direção e botão segurado são os do quadro mais novo.
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Golpe.h"
 
 namespace padel
 {
-class PassoFixo
+class PADELSIM_API PassoFixo
 {
 public:
     explicit PassoFixo(int passosPorSegundo);

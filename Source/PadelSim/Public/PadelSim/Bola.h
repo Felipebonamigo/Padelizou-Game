@@ -5,13 +5,15 @@
 // fast-math. É o que faz o resultado sair igual ao do Padel.Core e igual em qualquer máquina (host e cliente online).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Tipos.h"
 #include <cstdint>
 #include <vector>
 
 namespace padel
 {
-class Bola
+class PADELSIM_API Bola
 {
 public:
     // Bola de padel (regra FIP): 56–59,4 g; 6,35–6,77 cm de diâmetro; quique de 135–145 cm ao cair de 2,54 m.
@@ -19,9 +21,12 @@ public:
     static constexpr float Raio = 0.0335f;
     static constexpr float G = 9.81f;
     static constexpr float MomentoDeInercia = 2.f / 3.f;   // casca esférica: I = (2/3) m R²
-    static constexpr float RestituicaoDoChao = 0.775f, AtritoDoChao = 0.6f;
-    static constexpr float RestituicaoDoVidro = 0.85f, AtritoDoVidro = 0.25f;
-    static constexpr float RestituicaoDaGrade = 0.4f, AtritoDaGrade = 0.8f;
+    static constexpr float RestituicaoDoChao = 0.775f;
+    static constexpr float AtritoDoChao = 0.6f;
+    static constexpr float RestituicaoDoVidro = 0.85f;
+    static constexpr float AtritoDoVidro = 0.25f;
+    static constexpr float RestituicaoDaGrade = 0.4f;
+    static constexpr float AtritoDaGrade = 0.8f;
     static constexpr float VariacaoDaRestituicaoDaGrade = 0.1f;
     static constexpr float SenoDoDesvioMaximoDaGrade = 0.25881904f;   // sen 15°, escrito direto (sem libm)
     static constexpr float RestituicaoDaRede = 0.2f;

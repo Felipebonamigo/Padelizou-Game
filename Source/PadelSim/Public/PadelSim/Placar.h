@@ -3,6 +3,8 @@
 // pontos corridos (Americano/Mexicano). Também diz quem saca e de que lado.
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -14,22 +16,22 @@ namespace padel
 enum class TipoDeEventoDoPlacar : int32_t { Ponto, Game, Set, Partida, Encerrada };
 enum class LadoDoSaque : int32_t { Direita, Esquerda };
 
-struct EventoDoPlacar
+struct PADELSIM_API EventoDoPlacar
 {
     TipoDeEventoDoPlacar Tipo;
     int32_t Time;
 };
-struct Sacador
+struct PADELSIM_API Sacador
 {
     int32_t Time, Jogador;
 };
-struct SetEncerrado
+struct PADELSIM_API SetEncerrado
 {
     std::array<int32_t, 2> Games;
     std::optional<std::array<int32_t, 2>> TieBreak;
 };
 
-class Placar
+class PADELSIM_API Placar
 {
 public:
     static constexpr int32_t PontosPorTurnoDeSaque = 4;

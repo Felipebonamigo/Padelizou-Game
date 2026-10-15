@@ -1,6 +1,8 @@
 // Transforma os eventos da física em decisão de ponto, pelas regras do padel (Padel.Core/Arbitro.cs).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Quadra.h"
 #include "PadelSim/Tipos.h"
 
@@ -11,7 +13,7 @@ namespace padel
 enum class Motivo : int32_t { DoisQuiques, Rede, NaoPassou, ParedeSemQuicar, ParedePropria, Fora, VoltouPeloVidro, DuplaFalta, ForaDaCaixa, BolaMorta };
 enum class TipoDeDecisao : int32_t { Ponto, Falta, Let };
 
-struct Decisao
+struct PADELSIM_API Decisao
 {
     TipoDeDecisao Tipo;
     int32_t Para;
@@ -21,7 +23,7 @@ struct Decisao
     static Decisao Let() { return {TipoDeDecisao::Let, -1, padel::Motivo::Rede}; }
 };
 
-struct Caixa
+struct PADELSIM_API Caixa
 {
     float XMin = 0, XMax = 0, YMin = 0, YMax = 0;
     bool Contem(float x, float y) const { return x >= XMin && x <= XMax && y >= YMin && y <= YMax; }
@@ -30,12 +32,12 @@ struct Caixa
 };
 
 /// Caixa de saque no lado dado, à direita ou à esquerda de quem está naquele lado (da rede até a linha de saque).
-Caixa CaixaDeSaque(int32_t lado, bool direita);
+PADELSIM_API Caixa CaixaDeSaque(int32_t lado, bool direita);
 
 /// A bola precisa cruzar a rede e quicar no chão do outro lado ANTES de tocar qualquer parede de lá; quicou do lado de
 /// quem bateu é ponto contra; depois de quicar, paredes à vontade e o segundo quique encerra; saque na caixa diagonal,
 /// duas faltas é ponto, let se tocou a rede e caiu na caixa; o mesmo time não bate duas vezes seguidas.
-class Arbitro
+class PADELSIM_API Arbitro
 {
 public:
     int32_t Faltas = 0;

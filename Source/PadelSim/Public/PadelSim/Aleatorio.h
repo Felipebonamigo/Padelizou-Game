@@ -1,11 +1,13 @@
 // Aleatório com semente (mulberry32): a mesma semente reproduz a mesma partida (Padel.Core/Util.cs).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include <cstdint>
 
 namespace padel
 {
-class Aleatorio
+class PADELSIM_API Aleatorio
 {
 public:
     explicit Aleatorio(uint32_t semente);

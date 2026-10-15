@@ -2,6 +2,8 @@
 // reage com atraso, aperta o botão com erro de timing. Serve pro modo demonstração, pra testes e pra calibrar.
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Aleatorio.h"
 #include "PadelSim/Arbitro.h"
 #include "PadelSim/Bola.h"
@@ -17,22 +19,25 @@ namespace padel
 class Partida;
 enum class EstadoDaPartida : int32_t;
 
-struct PerfilDeHumano
+struct PADELSIM_API PerfilDeHumano
 {
     std::string Nome;
     float TempoDeReacao, DesvioDoTempo, ErroDeLeitura, Agressividade;
 
-    static const PerfilDeHumano Iniciante, Intermediario, Avancado, Profissional;
+    static const PerfilDeHumano Iniciante;
+    static const PerfilDeHumano Intermediario;
+    static const PerfilDeHumano Avancado;
+    static const PerfilDeHumano Profissional;
 };
 
-struct JogadorVisivel
+struct PADELSIM_API JogadorVisivel
 {
     float X, Y, Vx, Vy;
     int32_t Time, Lado;
 };
 
 /// Só o que um jogador VÊ da partida.
-struct EstadoVisivel
+struct PADELSIM_API EstadoVisivel
 {
     EstadoDaPartida Estado;
     int32_t IndiceDoSacador;
@@ -48,7 +53,7 @@ struct EstadoVisivel
     Bola CopiaDaBola() const;
 };
 
-class HumanoSimulado
+class PADELSIM_API HumanoSimulado
 {
 public:
     HumanoSimulado(int32_t indiceDoJogador, PerfilDeHumano perfil, padel::Aleatorio& aleatorio, bool destro = true,

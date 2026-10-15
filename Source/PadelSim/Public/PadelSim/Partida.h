@@ -3,6 +3,8 @@
 // parâmetro e avisa por evento. É o que o Unreal roda por baixo do que mostra.
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Aleatorio.h"
 #include "PadelSim/Arbitro.h"
 #include "PadelSim/Bola.h"
@@ -26,7 +28,7 @@ enum class TipoDeEventoDaPartida : int32_t { SaquePreparado, Balanco, Errou, Gol
 enum class ModoDeGolpe : int32_t { Manual, Automatico };
 
 /// Um acontecimento da partida. Jogador: índice (time*2 + índice) ou -1. Em Golpe: o tipo e o lado do corpo.
-struct EventoDaPartida
+struct PADELSIM_API EventoDaPartida
 {
     EventoDaPartida(TipoDeEventoDaPartida tipo, int32_t jogador = -1, int32_t time = -1, std::optional<padel::Motivo> motivo = std::nullopt,
                     std::optional<TipoDeGolpe> golpe = std::nullopt, std::optional<LadoDoGolpe> lado = std::nullopt)
@@ -40,13 +42,13 @@ struct EventoDaPartida
     std::optional<LadoDoGolpe> Lado;
 };
 
-struct Mensagem
+struct PADELSIM_API Mensagem
 {
     std::string Texto;
     bool Destaque = false, Suave = false;
 };
 
-struct GolpeDado
+struct PADELSIM_API GolpeDado
 {
     int32_t Jogador;   // time*2 + índice
     TipoDeGolpe Tipo;
@@ -54,7 +56,7 @@ struct GolpeDado
     LadoDoGolpe Lado = LadoDoGolpe::Drive;
 };
 
-struct OpcoesDaPartida
+struct PADELSIM_API OpcoesDaPartida
 {
     padel::Dificuldade Dificuldade = padel::Dificuldade::Medio;
     bool PontoDeOuro = true;
@@ -76,13 +78,13 @@ struct OpcoesDaPartida
     static constexpr std::array<bool, 4> NinguemHumano{false, false, false, false};
 };
 
-struct Estatisticas
+struct PADELSIM_API Estatisticas
 {
     int32_t Pontos = 0, Golpes = 0, MaiorRally = 0, Faltas = 0, Lets = 0;
     std::map<padel::Motivo, int32_t> Motivos;
 };
 
-class Partida
+class PADELSIM_API Partida
 {
 public:
     static constexpr float EsperaDoSaqueHumano = 8.f;

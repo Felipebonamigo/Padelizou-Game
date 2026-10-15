@@ -2,6 +2,8 @@
 // não tratam (Max(-0, +0) = +0), e Util.Limitar é Min(maximo, Max(minimo, valor)).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include <cmath>
 
 namespace padel::mat
@@ -26,16 +28,16 @@ inline int Sinal(float v) { return v > 0 ? 1 : v < 0 ? -1 : 0; }
 // Sem libm (Padel.Core/MatematicaDeterministica.cs, Cephes): só soma, multiplicação, divisão, raiz, floor e bits, na
 // MESMA ordem do C# — o resultado sai igual em gcc, clang e MSVC e igual ao gabarito (TestesDaMatematica). O motor
 // nunca chama std::sin & cia.; o TestesDaMatematica barra a volta.
-float Seno(float x);
-float Cosseno(float x);
+PADELSIM_API float Seno(float x);
+PADELSIM_API float Cosseno(float x);
 /// Arco-tangente de y/x no quadrante certo, em (−π, π]. ArcoTangente2(0, 0) = 0.
-float ArcoTangente2(float y, float x);
+PADELSIM_API float ArcoTangente2(float y, float x);
 /// e^x; abaixo de −87,34 devolve 0 (atalho: o resultado seria subnormal; o motor nunca chega perto).
-float Exp(float x);
+PADELSIM_API float Exp(float x);
 /// ln x; Log(0) = −∞, negativo = NaN.
-float Log(float x);
+PADELSIM_API float Log(float x);
 /// b^e = e^(e·ln b) para b > 0.
-float Potencia(float b, float e);
+PADELSIM_API float Potencia(float b, float e);
 /// b^n por multiplicações seguidas (exato enquanto couber em 24 bits).
-float PotenciaInteira(float b, int n);
+PADELSIM_API float PotenciaInteira(float b, int n);
 } // namespace padel::mat

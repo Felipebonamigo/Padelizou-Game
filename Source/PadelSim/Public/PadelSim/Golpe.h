@@ -1,6 +1,8 @@
 // Tipos do golpe e da entrada (Padel.Core/Jogadores.cs).
 #pragma once
 
+#include "PadelSim/Exportar.h"
+
 #include "PadelSim/Tipos.h"
 
 #include <optional>
@@ -25,7 +27,7 @@ enum class Assistencia : int32_t { Pro, Padrao, Casual };
 
 /// Um golpe decidido: onde a bola deve cair, em quanto tempo, com que efeito e de que lado do corpo. Lancamento,
 /// quando vem, é a velocidade exata que um solucionador já simulou; sem ele, a partida calcula pelo alvo.
-struct Golpe
+struct PADELSIM_API Golpe
 {
     float AlvoX = 0, AlvoY = 0, TempoDeVoo = 0;
     TipoDeGolpe Tipo = TipoDeGolpe::Normal;
@@ -38,7 +40,7 @@ struct Golpe
 /// Entrada de um humano, no referencial DELE: Dy < 0 é "rumo à rede", Dx > 0 é "minha direita".
 /// AcaoPressionada saca e, no modo manual, começa o balanço; LobPressionada começa um balanço de lob. Os outros só valem
 /// no controle de quatro botões: X (cortado), Y (ataque, e se segue apertado) e o RB (modificador, segurado).
-struct Entrada
+struct PADELSIM_API Entrada
 {
     float Dx = 0, Dy = 0;
     bool AcaoPressionada = false, AcaoSegurada = false, LobPressionada = false;
