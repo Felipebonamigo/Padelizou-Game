@@ -59,6 +59,7 @@ private:
     void AtualizarJogadores();
     void AtualizarCamera(float DeltaSeconds);
     void AtualizarHud();
+    void AtualizarIndicador();
     void AoEventoDaPartida(const padel::EventoDaPartida& Evento);
     void TratarCapturas();
     void RodarTesteDeEntrada(class APlayerController* PC);
@@ -97,6 +98,8 @@ private:
     UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Narizes;
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> Anel;
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> BolaMalha;
+    UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> Marcador;   // o indicador de contato, no chão
+    FString UltimoIndicador;
     UPROPERTY(Transient) TObjectPtr<UPadelHudWidget> Hud;
     double CameraY = 0.0;
     bool bCameraInicializada = false;
@@ -123,7 +126,7 @@ private:
     // Medição e capturas (linha de comando)
     bool bCapturas = false, bSairNoFim = false, bTesteDeEntrada = false;
     int32 EtapaDoTesteDeEntrada = 0;
-    bool bCapturouRally = false, bCapturouFim = false;
+    bool bCapturouRally = false, bCapturouFim = false, bCapturouIndicador = false;
     double FimDesde = -1.0;
     double SomaDeMs = 0.0, MaiorMs = 0.0;
     int64 QuadrosMedidos = 0, QuadrosVistos = 0;

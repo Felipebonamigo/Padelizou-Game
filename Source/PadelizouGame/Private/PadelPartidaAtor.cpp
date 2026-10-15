@@ -21,6 +21,7 @@
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "PadelHudWidget.h"
+#include "PadelIndicador.h"
 #include "PadelPaineis.h"
 #include "PadelSim/Quadra.h"
 #include "UnrealClient.h"
@@ -157,6 +158,9 @@ void APadelPartidaAtor::ConstruirJogadores()
         Narizes.Add(NovaForma(MalhaCubo, MaterialCor, FLinearColor(0.02f, 0.02f, 0.03f), FVector(0, 0, 160), FVector(0.12, 0.34, 0.12)));
         Raquetes.Add(NovaForma(MalhaCilindro, MaterialCor, FLinearColor(0.95f, 0.95f, 0.95f), FVector(0, 0, 100), FVector(0.5, 0.5, 0.03)));
     }
+    // Marcador do indicador de contato: um disco no chão, escondido até haver bola vindo.
+    Marcador = NovaForma(MalhaCilindro, MaterialCor, FLinearColor(1.f, 0.85f, 0.1f), FVector(0, 0, 2), FVector(1, 1, 0.02));
+    Marcador->SetVisibility(false);
     // Anel no chão do jogador local.
     Anel = NovaForma(MalhaCilindro, MaterialCor, FLinearColor(1.f, 0.85f, 0.1f), FVector(0, 0, 1), FVector(1.1, 1.1, 0.02));
 }
@@ -214,7 +218,7 @@ void APadelPartidaAtor::IniciarPartida()
     }
 
     Eventos.Reset();
-    bCapturouRally = bCapturouFim = false;
+    bCapturouRally = bCapturouFim = bCapturouIndicador = false;
     FimDesde = -1.0;
     NomeDoModoParaArquivo = ModoDaProximaPartida == padel::ModoDeGolpe::Manual ? TEXT("manual") : TEXT("automatico");
     if (Hud) Hud->MostrarFim(false, FText::GetEmpty());
@@ -446,6 +450,55 @@ void APadelPartidaAtor::AtualizarHud()
     }
 }
 
+void APadelPartidaAtor::AtualizarIndicador()
+{
+    // Só no Manual: é o modo em que o aperto precisa de timing. Prevê o contato com a física do PadelSim (PadelIndicador.h).
+    bool bMostrar = false;
+    FString Texto;
+    FLinearColor Cor = FLinearColor::White;
+    if (Sim && Sim->Partida().Opcoes.ModoDeGolpe == padel::ModoDeGolpe::Manual)
+    {
+        const padel::Jogador& J = Sim->Partida().Jogadores[0];
+        if (!J.Balancando())
+        {
+            if (const auto P = FPadelIndicador::Prever(Sim->Partida(), 0))
+            {
+                // Verde dentro da janela do contato da assistência (no mínimo 50 ms, para dar para ver); passou da hora, some.
+                const double Janela = FMath::Max(0.05, static_cast<double>(padel::JanelaDoContato(J.Assistencia)));
+                if (P->SegundosParaApertar >= -Janela)
+                {
+                    bMostrar = true;
+                    const bool bAgora = FMath::Abs(P->SegundosParaApertar) <= Janela;
+                    Cor = bAgora ? FLinearColor(0.1f, 1.f, 0.2f) : FLinearColor(1.f, 0.85f, 0.1f);
+                    Texto = bAgora ? FString(TEXT("APERTE!")) : FString::Printf(TEXT("aperte em %.1f s"), FMath::Max(0.0, P->SegundosParaApertar));
+                    // O disco encolhe até a hora de apertar: 2 m a 0,8 s, 50 cm na hora.
+                    const double Diametro = 50.0 + 150.0 * FMath::Clamp(P->SegundosParaApertar / 0.8, 0.0, 1.0);
+                    Marcador->SetRelativeLocation(PadelCoordenadas::ParaUnreal(P->X, P->Y, 0.f) + FVector(0, 0, 2));
+                    Marcador->SetRelativeScale3D(FVector(Diametro / 100.0, Diametro / 100.0, 0.02));
+                    if (UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Marcador->GetMaterial(0))) Mid->SetVectorParameterValue(TEXT("Cor"), Cor);
+                }
+            }
+        }
+    }
+    Marcador->SetVisibility(bMostrar);
+    if (bCapturas && !bCapturouIndicador && Texto == TEXT("APERTE!"))
+    {
+        bCapturouIndicador = true;
+        const FString Arquivo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("docs/imagens/indicador-manual.png"));
+        FScreenshotRequest::RequestScreenshot(Arquivo, true, false);
+        UE_LOG(LogPadel, Display, TEXT("PADEL_CAPTURA %s"), *Arquivo);
+    }
+    if (Hud && Texto != UltimoIndicador)
+    {
+        UltimoIndicador = Texto;
+        Hud->MostrarIndicador(FText::FromString(Texto), Cor);
+    }
+    else if (Hud && bMostrar)
+    {
+        Hud->MostrarIndicador(FText::FromString(Texto), Cor);
+    }
+}
+
 void APadelPartidaAtor::AtualizarJogadores()
 {
     const padel::Partida& Pa = Sim->Partida();
@@ -613,6 +666,7 @@ void APadelPartidaAtor::Tick(float DeltaSeconds)
         Sim->Quadro(FMath::Min<double>(DeltaSeconds, 0.25), Entrada);
     }
     AtualizarJogadores();
+    AtualizarIndicador();
     AtualizarCamera(DeltaSeconds);
     AtualizarHud();
     TratarCapturas();

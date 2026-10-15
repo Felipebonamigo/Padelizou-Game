@@ -55,6 +55,10 @@ bool UPadelHudWidget::Initialize()
     TextoDaMensagem = NovoTexto(WidgetTree, 32, ETextJustify::Center);
     Ancorar(Cast<UCanvasPanelSlot>(Raiz->AddChild(TextoDaMensagem)), FVector2D(0.5, 1), FVector2D(0.5, 1), FVector2D(0, -90));
 
+    TextoDoIndicador = NovoTexto(WidgetTree, 44, ETextJustify::Center);
+    Ancorar(Cast<UCanvasPanelSlot>(Raiz->AddChild(TextoDoIndicador)), FVector2D(0.5, 1), FVector2D(0.5, 1), FVector2D(0, -160));
+    TextoDoIndicador->SetVisibility(ESlateVisibility::Collapsed);
+
     TextoDoModo = NovoTexto(WidgetTree, 16);
     Ancorar(Cast<UCanvasPanelSlot>(Raiz->AddChild(NovaCaixa(WidgetTree, TextoDoModo, 0.4f))), FVector2D(0, 1), FVector2D(0, 1), FVector2D(24, -24));
 
@@ -72,6 +76,14 @@ void UPadelHudWidget::Atualizar(const FText& Placar, const FText& Mensagem, cons
     if (TextoDaMensagem) TextoDaMensagem->SetText(Mensagem);
     if (TextoDosEventos) TextoDosEventos->SetText(Eventos);
     if (TextoDoModo) TextoDoModo->SetText(Modo);
+}
+
+void UPadelHudWidget::MostrarIndicador(const FText& Texto, const FLinearColor& Cor)
+{
+    if (!TextoDoIndicador) return;
+    TextoDoIndicador->SetVisibility(Texto.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    TextoDoIndicador->SetText(Texto);
+    TextoDoIndicador->SetColorAndOpacity(FSlateColor(Cor));
 }
 
 void UPadelHudWidget::MostrarFim(bool bMostrar, const FText& Resumo)
