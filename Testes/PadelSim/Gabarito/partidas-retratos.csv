@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em 7867e84
+# gabarito do Padel.Core em bc09d73
 id,passo,estado,temporizador,tempoDeJogo,rally,ultimoErro,bx,by,bz,bvx,bvy,bvz,bwx,bwy,bwz,emJogo,rolando,parada,pontos0,pontos1,games0,games1,sets0,sets1,tieBreak,sacadorTime,sacadorJogador,faltas,golpeador,quicou,formacao0,formacao1,j0x,j0y,j0vx,j0vy,j0balanco,j0tempoNoBalanco,j0cooldown,j0golpes,j1x,j1y,j1vx,j1vy,j1balanco,j1tempoNoBalanco,j1cooldown,j1golpes,j2x,j2y,j2vx,j2vy,j2balanco,j2tempoNoBalanco,j2cooldown,j2golpes,j3x,j3y,j3vx,j3vy,j3balanco,j3tempoNoBalanco,j3cooldown,j3golpes
 0,0,0,1.1,0,0,0,2.6,8.3,0.8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,2.6,8.3,0,0,0,0,0,0,-2.3,3.6,0,0,0,0,0,0,-2.8,-8,0,0,0,0,0,0,2.3,-4.2,0,0,0,0,0,0
 0,120,0,0.10000073,0.9999994,0,0,2.6,8.3,0.8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,2.6,8.3,0,0,0,0,0,0,-2.3,3.6,0,0,0,0,0,0,-2.8,-8,0,0,0,0,0,0,2.3,-4.2,0,0,0,0,0,0

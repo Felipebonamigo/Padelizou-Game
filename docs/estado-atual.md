@@ -2,6 +2,19 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 15/10/2026 (2) — rastro-fantasma da saída de parede
+
+- Pilar 1 do design ("a parede é a estrela"): `RastroFantasma.Prever` no `Padel.Core` (`2c48d97`) e
+  `rastro_fantasma::Prever` no PadelSim. Roda a física da partida adiante numa cópia da bola, no passo da partida, até a
+  bola deixar de ter jogo do lado de quem recebe (segundo quique, vidro antes do quique, outro lado, saída, 3 s), e
+  marca o primeiro ponto depois da batida no vidro já quicada. Não é regra: é previsão.
+- Como o Unreal usa, pelo nível de assistência do design: **Casual**, desenha a partir de `PrimeiroDepoisDaParede`
+  assim que a bola vem; **Padrão**, pede o rastro no passo do evento `Parede` (aí ele inteiro é a saída); **Pro**, nada.
+  Vai num pedido da etapa de semanas 5–6 (os 6 golpes e a saída de parede), depois da quadra cinza.
+- 9 testes no Core, vistos falhar, entre eles o de que o rastro é bit a bit o caminho da bola quando ninguém bate (Core
+  684 verdes; Arena `verificar_tudo.sh` verde). Gabarito com 8 rastros (`rastros.csv`, `rastros-pontos.csv`); o C++
+  reprovou com a casca vazia (1.496 de 1.502) e, portado, deu 0 falhas; 7 testes verdes em gcc e clang.
+
 ## 15/10/2026 — controle de quatro botões
 
 - O controle do `DESIGN.md` (A chapado, B lob, X cortado, Y ataque, RB modificador) entrou no `Padel.Core` (`7867e84`)

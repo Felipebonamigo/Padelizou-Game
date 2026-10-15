@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em 7867e84
+# gabarito do Padel.Core em bc09d73
 id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets,controle
 0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,53683,6-1,0,0,39,309,17,0,0,0
 1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,38167,6-0,0,0,31,183,18,0,0,0

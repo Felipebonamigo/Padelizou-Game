@@ -18,7 +18,8 @@ add_library(PadelSim STATIC
     Source/PadelSim/Private/Partida.cpp
     Source/PadelSim/Private/PassoFixo.cpp
     Source/PadelSim/Private/Placar.cpp
-    Source/PadelSim/Private/Quadra.cpp)
+    Source/PadelSim/Private/Quadra.cpp
+    Source/PadelSim/Private/RastroFantasma.cpp)
 target_include_directories(PadelSim PUBLIC Source/PadelSim/Public)
 # Determinismo: nada de contrair a*b+c num FMA nem de matemática "rápida" — o resultado tem de bater com o Padel.Core.
 if(MSVC)
@@ -29,7 +30,7 @@ endif()
 
 enable_testing()
 # Um executável por área, todos contra o gabarito do Padel.Core.
-foreach(teste TestesDaMatematica TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro)
+foreach(teste TestesDaMatematica TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro TestesDoRastroFantasma)
     add_executable(${teste} Testes/PadelSim/${teste}.cpp)
     target_link_libraries(${teste} PRIVATE PadelSim)
     target_compile_definitions(${teste} PRIVATE PASTA_DO_GABARITO="${CMAKE_CURRENT_SOURCE_DIR}/Testes/PadelSim/Gabarito"
