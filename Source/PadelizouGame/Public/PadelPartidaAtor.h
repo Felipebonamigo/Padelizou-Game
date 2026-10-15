@@ -36,6 +36,11 @@ public:
     UPROPERTY(EditAnywhere, Category = "Padel")
     float EscalaVisualDaBola = 2.5f;
 
+    /// Quanto a câmera acompanha a bola de lado (0 = parada; 0,55 = o x da bola vezes 0,55). O pedido 0002 pedia o
+    /// acompanhamento, mas no playtest "a quadra se mexendo" incomodou: parada por padrão.
+    UPROPERTY(EditAnywhere, Category = "Padel")
+    float SeguimentoLateralDaCamera = 0.f;
+
     /// Em vez do controle, quem joga o jogador 0 é o padel::HumanoSimulado (para provar a partida sem mãos).
     UPROPERTY(EditAnywhere, Category = "Padel")
     bool bHumanoSimulado = false;
@@ -101,7 +106,8 @@ private:
     // Simulação
     TUniquePtr<FPadelSimulacao> Sim;
     padel::OpcoesDaPartida OpcoesAtuais;
-    padel::ModoDeGolpe ModoDaProximaPartida = padel::ModoDeGolpe::Manual;
+    // Automático (a bola é batida sozinha, o jogador só anda e escolhe a direção) até o timing do Manual estar bom.
+    padel::ModoDeGolpe ModoDaProximaPartida = padel::ModoDeGolpe::Automatico;
     padel::Assistencia AssistenciaAtual = padel::Assistencia::Casual;   // o Pro (timing de ±0 ms) é duro demais para começar
     int32 IndiceDaVelocidade = 0;   // 0 = 100 %, 1 = 50 %, 2 = 25 % (câmera lenta para analisar o jogo)
     TUniquePtr<padel::Aleatorio> AleatorioDoHumano;

@@ -138,3 +138,12 @@ Retorno: "não dá para enxergar direito por causa da quadra, os bonecos estão 
 4. **Duro demais:** a assistência inicial passou de Pro para **Casual** (janela de ±40 ms no timing; muda com F3 a qualquer hora). Novo **F4**: câmera lenta 100 % → 50 % → 25 % (`SetGlobalTimeDilation`; o passo fixo de 120 Hz segue valendo), para analisar o jogo.
 
 Reverificado neste turno: `PadelizouGame.*` 11 de 11 `Success`; partida simulada de novo no Pro com semente 42: `5-4(2)`, 711,0 s, Tick do ator com média de 0,051 ms (máximo 0,928 ms) — a conversão não mexeu na simulação. Capturas refeitas em `docs/imagens/`.
+
+### Segundo retorno do playtest (15/10/2026)
+
+Retorno: "A e D funcionaram, mas a jogabilidade está muito estranha: a quadra se mexendo, não gostei; parece que ao apertar o botão para bater na bolinha não vai".
+
+1. **"A quadra se mexendo":** era a câmera seguindo a bola de lado (item 5 do pedido, com 55 % do x da bola). Agora é `SeguimentoLateralDaCamera`, **padrão 0 (câmera parada)**; o acompanhamento fica na propriedade, para quando for desejado.
+2. **"O botão não bate":** não era bug de entrada. Provado injetando teclas no jogo (`-PadelTesteDeEntrada`, semente 42, assistência Casual): no **Manual**, Espaço saca (`Jogador 0: saque`) e Shift começa o balanço (`Balanço`), que, fora de hora, termina em `Errou`; no **Automático**, o mesmo aperto vira `drive` sozinho. O Manual exige apertar ~0,12 s antes de a bola chegar ao ponto de contato (janela de ±40 ms no Casual), e o jogo não mostrava o erro (os eventos `Balanço` e `Errou` não iam para a tela).
+3. **Mudanças:** (a) o modo padrão passou a **Automático** (F2 volta ao Manual; `-PadelModo=manual` na linha de comando); (b) o `Balanço` e o `Errou: a raquete passou sem pegar a bola` do jogador local aparecem no log da tela; (c) a raquete visual ficou maior (50 cm).
+4. **Em aberto (decisão do Felipe):** o timing do Manual. Opções: alargar a janela do Casual (regra, vem do `Padel.Core`), um indicador visual do ponto/hora do contato, ou manter o Automático como padrão até a etapa de feel.

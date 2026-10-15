@@ -155,7 +155,7 @@ void APadelPartidaAtor::ConstruirJogadores()
         Cabecas.Add(NovaForma(MalhaEsfera, MaterialCor, Cor, FVector(0, 0, 155), FVector(0.5, 0.5, 0.5)));
         Bases.Add(NovaForma(MalhaEsfera, MaterialCor, Cor, FVector(0, 0, 25), FVector(0.5, 0.5, 0.5)));
         Narizes.Add(NovaForma(MalhaCubo, MaterialCor, FLinearColor(0.02f, 0.02f, 0.03f), FVector(0, 0, 160), FVector(0.12, 0.34, 0.12)));
-        Raquetes.Add(NovaForma(MalhaCilindro, MaterialCor, FLinearColor(0.95f, 0.95f, 0.95f), FVector(0, 0, 100), FVector(0.34, 0.34, 0.02)));
+        Raquetes.Add(NovaForma(MalhaCilindro, MaterialCor, FLinearColor(0.95f, 0.95f, 0.95f), FVector(0, 0, 100), FVector(0.5, 0.5, 0.03)));
     }
     // Anel no chão do jogador local.
     Anel = NovaForma(MalhaCilindro, MaterialCor, FLinearColor(1.f, 0.85f, 0.1f), FVector(0, 0, 1), FVector(1.1, 1.1, 0.02));
@@ -175,9 +175,9 @@ void APadelPartidaAtor::LerLinhaDeComando()
     bSairNoFim = FParse::Param(Linha, TEXT("PadelSairNoFim"));
     bTesteDeEntrada = FParse::Param(Linha, TEXT("PadelTesteDeEntrada"));
     FString Modo;
-    if (FParse::Value(Linha, TEXT("PadelModo="), Modo) && Modo.Equals(TEXT("auto"), ESearchCase::IgnoreCase))
+    if (FParse::Value(Linha, TEXT("PadelModo="), Modo))
     {
-        ModoDaProximaPartida = padel::ModoDeGolpe::Automatico;
+        ModoDaProximaPartida = Modo.Equals(TEXT("manual"), ESearchCase::IgnoreCase) ? padel::ModoDeGolpe::Manual : padel::ModoDeGolpe::Automatico;
     }
     FParse::Value(Linha, TEXT("PadelSemente="), Semente);
     FString Assist;
@@ -358,6 +358,7 @@ void APadelPartidaAtor::AoEventoDaPartida(const padel::EventoDaPartida& E)
     {
     case T::Golpe:
         Texto = FString::Printf(TEXT("Jogador %d: %s"), E.Jogador, E.Golpe ? NomeDoGolpe(*E.Golpe) : TEXT("golpe"));
+        if (bTesteDeEntrada && E.Jogador == 0) UE_LOG(LogPadel, Display, TEXT("PADEL_EVENTO %s"), *Texto);
         break;
     case T::Quique: Texto = TEXT("Quique"); break;
     case T::Parede: Texto = TEXT("Parede"); break;
@@ -365,6 +366,16 @@ void APadelPartidaAtor::AoEventoDaPartida(const padel::EventoDaPartida& E)
         Texto = FString::Printf(TEXT("PONTO time %d%s%s"), E.Time, E.Motivo ? TEXT(": ") : TEXT(""),
                                 E.Motivo ? *Utf8(padel::Partida::TextoDoMotivo(*E.Motivo)) : TEXT(""));
         UE_LOG(LogPadel, Display, TEXT("PADEL_EVENTO %s | %s"), *Texto, *UltimoPlacar.Replace(TEXT("\n"), TEXT(" / ")));
+        break;
+    case T::Balanco:
+        if (E.Jogador != 0) return;   // só o balanço do jogador local interessa na tela
+        Texto = TEXT("Balanço");
+        if (bTesteDeEntrada) UE_LOG(LogPadel, Display, TEXT("PADEL_EVENTO Balanço do jogador %d"), E.Jogador);
+        break;
+    case T::Errou:
+        if (E.Jogador != 0) return;
+        Texto = TEXT("Errou: a raquete passou sem pegar a bola");
+        if (bTesteDeEntrada) UE_LOG(LogPadel, Display, TEXT("PADEL_EVENTO Errou, jogador %d"), E.Jogador);
         break;
     case T::Falta: Texto = TEXT("Falta"); break;
     case T::Let: Texto = TEXT("Let"); break;
@@ -469,7 +480,7 @@ void APadelPartidaAtor::AtualizarCamera(float DeltaSeconds)
     const double X = (padel::quadra::MeioComprimento + 17.5) * M;
     const double Z = 7.5 * M;
     const double BolaY = PadelCoordenadas::ParaUnreal(Sim->Partida().Bola.X, 0.f, 0.f).Y;
-    const double Alvo = BolaY * 0.55;
+    const double Alvo = BolaY * SeguimentoLateralDaCamera;
     if (!bCameraInicializada)
     {
         CameraY = Alvo;
