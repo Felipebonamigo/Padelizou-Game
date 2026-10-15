@@ -51,7 +51,8 @@ struct EstadoVisivel
 class HumanoSimulado
 {
 public:
-    HumanoSimulado(int32_t indiceDoJogador, PerfilDeHumano perfil, padel::Aleatorio& aleatorio, bool destro = true);
+    HumanoSimulado(int32_t indiceDoJogador, PerfilDeHumano perfil, padel::Aleatorio& aleatorio, bool destro = true,
+                   padel::Controle controle = padel::Controle::DoisBotoes);
 
     PerfilDeHumano Perfil;
     int32_t Indice() const { return indice; }
@@ -75,6 +76,7 @@ private:
 
     int32_t indice;
     padel::Aleatorio* aleatorio;
+    padel::Controle controle;
     Jogador eu, corpoNoContato;
     Leitura ultimaLeitura{-2, std::nullopt, false};
     float desdeALeitura = 0, desdeOAperto = 0;
@@ -84,6 +86,8 @@ private:
     float esperaDoSaque = -1;
 
     Entrada NoRally(const EstadoVisivel& e, float dt);
+    Entrada Aperto(float dx, float dy) const;
+    Entrada Segurando(float dx, float dy) const;
     bool AindaNaoEHoraDeApertar(float segundosAteOPonto) const;
     std::pair<float, float> IrAte(float x, float y, float distancia) const;
     std::optional<Contato> PreverContato(const EstadoVisivel& e) const;

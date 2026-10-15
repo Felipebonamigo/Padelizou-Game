@@ -10,6 +10,7 @@
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -133,6 +134,7 @@ int main()
         o.ModoDeGolpe = static_cast<ModoDeGolpe>(std::atoi(c[9].c_str()));
         o.Semente = static_cast<uint32_t>(std::strtoul(c[10].c_str(), nullptr, 10));
         if (std::atoi(c[11].c_str()) >= 0) o.PontosCorridos = std::atoi(c[11].c_str());
+        o.Controle = static_cast<Controle>(std::atoi(c[21].c_str()));
         const int passosEsperados = std::atoi(c[12].c_str());
 
         int passo = 0;
@@ -166,7 +168,7 @@ int main()
         if (temHumano)
         {
             aleatorioDoHumano.emplace(*o.Semente + 1000);
-            humano.emplace(0, PerfilPeloNome(c[8]), *aleatorioDoHumano);
+            humano.emplace(0, PerfilPeloNome(c[8]), *aleatorioDoHumano, true, o.Controle);
         }
         std::array<Entrada, 4> entradas{};
 
@@ -193,6 +195,16 @@ int main()
                      p.Estatisticas.MaiorRally == std::atoi(c[18].c_str()) && p.Estatisticas.Faltas == std::atoi(c[19].c_str()) && p.Estatisticas.Lets == std::atoi(c[20].c_str());
         if (!fimOk) Falhar(resumo);
         std::printf("partida %d (%s): %s\n", id, nome.c_str(), falhasDaPartida == 0 ? "igual ao Padel.Core" : "DIFERENTE");
+    }
+    // Como no Core (ControleDeQuatroBotoesTests): quatro botões só no modo Manual, e a Partida recusa o Automático.
+    {
+        OpcoesDaPartida o;
+        o.Controle = Controle::QuatroBotoes;
+        o.ModoDeGolpe = ModoDeGolpe::Automatico;
+        bool recusou = false;
+        try { Partida p(o); } catch (const std::invalid_argument&) { recusou = true; }
+        ++verificacoes;
+        if (!recusou) { ++falhas; std::printf("FALHA: a Partida aceitou quatro botões no modo Automático\n"); }
     }
     std::printf("Partidas: %d verificações, %d falha(s).\n", verificacoes, falhas);
     return falhas == 0 ? 0 : 1;

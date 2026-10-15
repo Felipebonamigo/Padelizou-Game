@@ -1,10 +1,11 @@
-# gabarito do Padel.Core em 2b7d8a5
-id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets
-0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,53683,6-1,0,0,39,309,17,0,0
-1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,38167,6-0,0,0,31,183,18,0,0
-2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,82304,2-6,1,0,45,505,33,0,0
-3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,60976,6-2,0,0,46,337,22,0,0
-4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,101811,4-6,1,0,57,596,54,0,0
-5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,27228,11-5,0,0,16,187,52,0,0
-6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,52690,6-3,0,0,54,242,14,0,0
-7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,61490,4-2,0,0,36,377,37,0,0
+# gabarito do Padel.Core em 7867e84
+id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets,controle
+0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,53683,6-1,0,0,39,309,17,0,0,0
+1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,38167,6-0,0,0,31,183,18,0,0,0
+2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,82304,2-6,1,0,45,505,33,0,0,0
+3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,60976,6-2,0,0,46,337,22,0,0,0
+4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,101811,4-6,1,0,57,596,54,0,0,0
+5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,27228,11-5,0,0,16,187,52,0,0,0
+6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,52690,6-3,0,0,54,242,14,0,0,0
+7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,61490,4-2,0,0,36,377,37,0,0,0
+8,formato curto; quatro botões; humano Avançado x Médio,1,1,1,4,10,1,Avançado,0,126,-1,71550,5-4(3),0,0,57,384,22,0,0,1

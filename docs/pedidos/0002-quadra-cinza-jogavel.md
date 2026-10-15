@@ -30,10 +30,15 @@ câmera de TV, drive, lob e saque, e o placar.**
    17,5 m de recuo da linha de fundo, olhando o centro da quadra, seguindo a bola só no eixo lateral, com atraso suave.
 6. **Controle (Enhanced Input)**, no referencial do jogador (Dy < 0 = rumo à rede, Dx > 0 = direita dele):
    analógico esquerdo/WASD → `Dx, Dy`; **A/Espaço** → `AcaoPressionada` no quadro do aperto e `AcaoSegurada` enquanto
-   apertado; **B/Shift** → `LobPressionada`. Teclado e controle. (Os quatro botões do design — X bandeja, Y ataque,
-   RB parede — precisam de mudança no `Padel.Core` primeiro; ficam para um pedido depois desta etapa.)
-7. **Modo de golpe:** opção no menu de debug entre `Manual` (o timing é seu) e `Automatico` (bate sozinho), que é o
-   "Casual" do design.
+   apertado; **B/Shift** → `LobPressionada`; **X/Q** → `CortadoPressionado`; **Y/E** → `AtaquePressionado` no quadro do
+   aperto e `AtaqueSegurado` enquanto apertado; **RB/Ctrl** → `ModificadorSegurado` enquanto apertado. Teclado e controle.
+   A partida usa `OpcoesDaPartida{ .Controle = Controle::QuatroBotoes }` (o PadelSim já tem, desde 15/10): o botão que
+   começa o balanço escolhe o golpe — A chapado (segurado: ataque), B lob, X bandeja na bola alta e slice na baixa, Y
+   smash na alta (segurado: por 3/por 4; com RB: víbora) e ataque na baixa — e o analógico só a direção.
+7. **Modo de golpe:** opção no menu de debug entre `Manual` com quatro botões (o timing é seu; o padrão) e `Automatico`
+   (bate sozinho), que é o "Casual" provisório do design. O `Automatico` só existe com `Controle::DoisBotoes` (a
+   Partida recusa a outra combinação com `std::invalid_argument`): no de dois botões, frente/trás/lado no analógico é que
+   escolhem o golpe.
 8. **Placar de TV** mínimo (UMG): pontos com `Placar.TextoDosPontos(time)`, games e sets, a `Mensagem` da partida
    quando houver. Fim de partida: tela com `Placar.Resumo()` e "jogar de novo". A partida da fatia é o **formato
    curto** do design: `OpcoesDaPartida{ .GamesPorSet = 4, .PontosDoTieBreak = 10 }` (set até 4, super tie-break a 10).

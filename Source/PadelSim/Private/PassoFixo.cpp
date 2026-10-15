@@ -25,6 +25,8 @@ int PassoFixo::Quadro(double delta, const Entrada& entrada)
 {
     acaoPendente |= entrada.AcaoPressionada;
     lobPendente |= entrada.LobPressionada;
+    cortadoPendente |= entrada.CortadoPressionado;
+    ataquePendente |= entrada.AtaquePressionado;
     passosDoQuadro = 0;
     if (!(delta > 0) || !std::isfinite(delta)) return 0;
 
@@ -37,7 +39,9 @@ int PassoFixo::Quadro(double delta, const Entrada& entrada)
     primeira = entrada;
     primeira.AcaoPressionada = acaoPendente;
     primeira.LobPressionada = lobPendente;
-    acaoPendente = lobPendente = false;
+    primeira.CortadoPressionado = cortadoPendente;
+    primeira.AtaquePressionado = ataquePendente;
+    acaoPendente = lobPendente = cortadoPendente = ataquePendente = false;
     passosDoQuadro = passos;
     return passos;
 }
@@ -49,6 +53,8 @@ Entrada PassoFixo::EntradaDoPasso(int i) const
     Entrada e = primeira;
     e.AcaoPressionada = false;
     e.LobPressionada = false;
+    e.CortadoPressionado = false;
+    e.AtaquePressionado = false;
     return e;
 }
 } // namespace padel

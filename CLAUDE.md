@@ -19,9 +19,9 @@ as paredes como estrela, visual de transmissão. Estúdio de uma pessoa (Felipe)
 ## A física e o gabarito
 
 - `Source/PadelSim` é C++17 puro, sem `UObject`: compila no CMake (nuvem, CI) e como módulo do Unreal.
-- É porte linha a linha do `Padel.Core` (C#, repositório `padelizou`, pasta `padelizou-arena/Padel.Core`), que tem
-  642 testes e é o **gabarito**: `Testes/PadelSim/Gabarito/*.csv` guarda o que ele gravou — trajetórias da bola,
-  golpes, golpes especiais, 7 partidas inteiras passo a passo e o `PassoFixo` — e o C++ reproduz **bit a bit**
+- É porte linha a linha do `Padel.Core` (C#, repositório `padelizou`, pasta `padelizou-arena/Padel.Core`), com a suíte
+  dele (`Padel.Core.Tests`), e é o **gabarito**: `Testes/PadelSim/Gabarito/*.csv` guarda o que ele gravou — trajetórias da bola,
+  golpes, golpes especiais, 9 partidas inteiras passo a passo (uma com o controle de quatro botões) e o `PassoFixo` — e o C++ reproduz **bit a bit**
   (tolerância zero; os números de hoje saem do `ctest`, skill `verificar`).
 - O que existe: `Bola`, `quadra`, `golpes::Calcular`, `golpes_especiais` (chiquita, contrapared, remates por 3 e por 4),
   `Aleatorio`, `Arbitro`, `Placar`, `Jogador`, `IA`, `Partida`, `HumanoSimulado` e `PassoFixo`. O Unreal só desenha,

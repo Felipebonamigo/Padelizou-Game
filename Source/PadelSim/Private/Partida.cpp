@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <random>
+#include <stdexcept>
 
 namespace padel
 {
@@ -64,6 +65,8 @@ Partida::Partida(OpcoesDaPartida opcoes)
     : Opcoes(opcoes), Aleatorio(opcoes.Semente ? *opcoes.Semente : SementeAleatoria()),
       Placar(opcoes.PontosCorridos ? padel::Placar::DePontosCorridos(*opcoes.PontosCorridos, 0) : padel::Placar(opcoes.PontoDeOuro, opcoes.SetsParaVencer, 0, opcoes.GamesPorSet, opcoes.PontosDoTieBreak))
 {
+    if (Opcoes.Controle == padel::Controle::QuatroBotoes && Opcoes.ModoDeGolpe != padel::ModoDeGolpe::Manual)
+        throw std::invalid_argument("O controle de quatro botões só vale no modo Manual: o botão do balanço é que escolhe o golpe");
     const PerfilDeIA& rival = perfis::Por(Opcoes.Dificuldade);
     const auto& h = Opcoes.Humanos;
     Jogadores.reserve(4);
@@ -226,9 +229,10 @@ void Partida::Rally(float dt)
             j.Cooldown = 0.45f;
             Emitir({TipoDeEventoDaPartida::Errou, IndiceDe(j), j.Time});
         }
-        if ((e.AcaoPressionada || e.LobPressionada) && !j.Balancando() && j.Cooldown <= 0)
+        auto intencao = IntencaoDoAperto(e);
+        if (intencao && !j.Balancando() && j.Cooldown <= 0)
         {
-            j.IniciarBalanco(e.LobPressionada);
+            j.IniciarBalanco(*intencao);
             Emitir({TipoDeEventoDaPartida::Balanco, IndiceDe(j), j.Time});
         }
     }
@@ -305,6 +309,20 @@ void Partida::Golpear(Jogador& jogador)
     Emitir({TipoDeEventoDaPartida::Golpe, IndiceDe(jogador), jogador.Time, std::nullopt, golpe.Tipo, golpe.Lado});
 }
 
+/// O botão apertado neste passo que começa um balanço, se houver. Lob antes da ação; no de quatro botões, Y antes de X e
+/// os dois antes do A. No de dois botões, X e Y não existem.
+std::optional<IntencaoDoGolpe> Partida::IntencaoDoAperto(const Entrada& e) const
+{
+    if (e.LobPressionada) return IntencaoDoGolpe::Lob;
+    if (Opcoes.Controle == padel::Controle::QuatroBotoes)
+    {
+        if (e.AtaquePressionado) return IntencaoDoGolpe::Ataque;
+        if (e.CortadoPressionado) return IntencaoDoGolpe::Cortado;
+    }
+    if (e.AcaoPressionada) return IntencaoDoGolpe::Chapado;
+    return std::nullopt;
+}
+
 Golpe Partida::GolpeDoHumano(Jogador& jogador, const Entrada& entrada)
 {
     Golpe g = EscolherGolpeDoHumano(jogador, entrada);
@@ -334,45 +352,68 @@ Golpe Partida::EscolherGolpeDoHumano(Jogador& jogador, const Entrada& entrada)
     bool ladoForte = std::fabs(entrada.Dx) >= LimiarDoLadoForte;
     int32_t paraOLado = (entrada.Dx < 0 ? -1 : 1) * lado;   // o lado forte, no mundo
     bool bolaAlta = Bola.Z > AlturaDaBolaAlta;
+    // Cada golpe sorteia o ruído na ordem do C# (os argumentos de lá, da esquerda pra direita, viram locais aqui).
+    auto Smash = [&] { float y = ladoDoAlvo * (4.2f + Ruido()); return NovoGolpe(x, y, 0.4f, TipoDeGolpe::Smash, false, {1500, 0}); };
+    auto Lob = [&] { float y = ladoDoAlvo * (8.2f + Ruido() * 0.5f); return NovoGolpe(x, y, 1.6f, TipoDeGolpe::Lob, false, {-400, 0}); };
+    auto Vibora = [&] {
+        float vx = mat::Limitar(3.8f * paraOLado + Ruido(), -4.5f, 4.5f);
+        float vy = ladoDoAlvo * (6.5f + Ruido());
+        return NovoGolpe(vx, vy, 0.7f, TipoDeGolpe::Vibora, false, {-800, static_cast<float>(1800 * paraOLado * ladoDoAlvo)});
+    };
+    auto Bandeja = [&] { float y = ladoDoAlvo * (7.5f + Ruido()); return NovoGolpe(x, y, 0.95f, TipoDeGolpe::Bandeja, false, {-1500, 500}); };
+    auto Ataque = [&] { float y = ladoDoAlvo * (4.5f + Ruido()); return NovoGolpe(x, y, 0.6f, TipoDeGolpe::Ataque, false, {2200, 0}); };
+    auto Defesa = [&] { float y = ladoDoAlvo * (7.8f + Ruido()); return NovoGolpe(x, y, 1.05f, TipoDeGolpe::Defesa, false, {-1200, 0}); };
+    auto Normal = [&] { float y = ladoDoAlvo * (6.6f + Ruido()); return NovoGolpe(x, y, 0.8f, TipoDeGolpe::Normal, false, {1200, 0}); };
+    // Por 4; com lado forte, por 3 pra aquele lado. Vazio se o contato foi ruim ou se o solucionador não acha.
+    auto RemateForte = [&]() -> std::optional<Golpe> {
+        if (erro >= ErroMaximoDoRemateForte) return std::nullopt;
+        return ladoForte ? golpes_especiais::SmashPor3(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, paraOLado)
+                         : golpes_especiais::SmashPor4(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, x);
+    };
+
+    if (Opcoes.Controle == padel::Controle::QuatroBotoes)
+    {
+        // O botão do balanço escolhe a família; a situação (bola alta ou baixa) escolhe o golpe dela; o analógico só mira.
+        switch (jogador.IntencaoDoBalanco())
+        {
+        case IntencaoDoGolpe::Lob: return Lob();
+        case IntencaoDoGolpe::Cortado: return bolaAlta ? Bandeja() : Defesa();
+        case IntencaoDoGolpe::Ataque:
+            if (!bolaAlta) return Ataque();
+            if (entrada.ModificadorSegurado) return Vibora();
+            if (entrada.AtaqueSegurado)
+                if (auto forte = RemateForte()) return *forte;
+            return Smash();
+        case IntencaoDoGolpe::Chapado: break;
+        }
+        return entrada.AcaoSegurada ? Ataque() : Normal();
+    }
+
     bool lob = manual ? jogador.BalancoDeLob() : entrada.AcaoSegurada;
     bool acaoSegurada = manual ? entrada.AcaoSegurada && !jogador.BalancoDeLob() : entrada.AcaoSegurada;
-    auto Smash = [&] { float y = ladoDoAlvo * (4.2f + Ruido()); return NovoGolpe(x, y, 0.4f, TipoDeGolpe::Smash, false, {1500, 0}); };
 
     if (bolaAlta && frente && acaoSegurada)
     {
-        if (erro < ErroMaximoDoRemateForte)
-        {
-            auto forte = ladoForte ? golpes_especiais::SmashPor3(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, paraOLado)
-                                   : golpes_especiais::SmashPor4(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, x);
-            if (forte) return *forte;
-        }
+        if (auto forte = RemateForte()) return *forte;
         return Smash();
     }
     if (lob)
     {
         if (frente)
             if (auto chiquita = golpes_especiais::Chiquita(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, x)) return *chiquita;
-        float y = ladoDoAlvo * (8.2f + Ruido() * 0.5f);
-        return NovoGolpe(x, y, 1.6f, TipoDeGolpe::Lob, false, {-400, 0});
+        return Lob();
     }
     if (tras && jogador.BolaAtrasJuntoAoVidro(Bola))
         if (auto contrapared = golpes_especiais::Contrapared(Bola.X, Bola.Y, Bola.Z, ladoDoAlvo, x)) return *contrapared;
     if (bolaAlta)
     {
         if (frente) return Smash();
-        if (ladoForte)
-        {
-            float vx = mat::Limitar(3.8f * paraOLado + Ruido(), -4.5f, 4.5f);
-            float vy = ladoDoAlvo * (6.5f + Ruido());
-            return NovoGolpe(vx, vy, 0.7f, TipoDeGolpe::Vibora, false, {-800, static_cast<float>(1800 * paraOLado * ladoDoAlvo)});
-        }
-        float y = ladoDoAlvo * (7.5f + Ruido());
-        return NovoGolpe(x, y, 0.95f, TipoDeGolpe::Bandeja, false, {-1500, 500});
+        if (ladoForte) return Vibora();
+        return Bandeja();
     }
-    if (frente) { float y = ladoDoAlvo * (4.5f + Ruido()); return NovoGolpe(x, y, 0.6f, TipoDeGolpe::Ataque, false, {2200, 0}); }
-    if (tras) { float y = ladoDoAlvo * (7.8f + Ruido()); return NovoGolpe(x, y, 1.05f, TipoDeGolpe::Defesa, false, {-1200, 0}); }
-    float y = ladoDoAlvo * (6.6f + Ruido());
-    return NovoGolpe(x, y, 0.8f, TipoDeGolpe::Normal, false, {1200, 0});
+    if (frente) return Ataque();
+    if (tras) return Defesa();
+    return Normal();
 }
 
 void Partida::Decidir(const Decisao& decisao)

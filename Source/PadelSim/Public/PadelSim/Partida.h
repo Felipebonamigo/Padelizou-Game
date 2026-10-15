@@ -66,6 +66,8 @@ struct OpcoesDaPartida
     /// Por jogador (time*2 + índice): quem é humano. Padrão: só o da casa, metade direita.
     std::array<bool, 4> Humanos{true, false, false, false};
     padel::ModoDeGolpe ModoDeGolpe = padel::ModoDeGolpe::Manual;
+    /// O esquema de botões do humano (padel::Controle). Quatro botões só no modo Manual: a Partida recusa o Automático.
+    padel::Controle Controle = padel::Controle::DoisBotoes;
     std::optional<uint32_t> Semente;
     /// Pontos corridos (Americano/Mexicano): o total que a soma dos pontos precisa alcançar. Vazio = games e sets.
     std::optional<int32_t> PontosCorridos;
@@ -132,6 +134,7 @@ private:
     void Rally(float dt);
     void FixarNoPontoDeSaida();
     void Golpear(Jogador& jogador);
+    std::optional<IntencaoDoGolpe> IntencaoDoAperto(const Entrada& e) const;
     Golpe GolpeDoHumano(Jogador& jogador, const Entrada& entrada);
     Golpe EscolherGolpeDoHumano(Jogador& jogador, const Entrada& entrada);
     void Decidir(const Decisao& decisao);

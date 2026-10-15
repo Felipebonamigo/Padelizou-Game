@@ -43,17 +43,19 @@ int main()
         if (id != idAtual || q != quadroAtual)
         {
             idAtual = id; quadroAtual = q;
-            padel::Entrada e{F(l[3]), F(l[4]), B(l[5]), B(l[6]), B(l[7])};
+            padel::Entrada e{F(l[3]), F(l[4]), B(l[5]), B(l[6]), B(l[7]), B(l[8]), B(l[9]), B(l[10]), B(l[11])};
             passosDoQuadro = p.Quadro(std::strtod(l[2].c_str(), nullptr), e);
             ++verificacoes;
-            if (passosDoQuadro != std::atoi(l[8].c_str()) && ++falhas <= 20)
-                std::printf("FALHA: sequência %d, quadro %d (delta %s): %d passos, esperado %s\n", id, q, l[2].c_str(), passosDoQuadro, l[8].c_str());
+            if (passosDoQuadro != std::atoi(l[12].c_str()) && ++falhas <= 20)
+                std::printf("FALHA: sequência %d, quadro %d (delta %s): %d passos, esperado %s\n", id, q, l[2].c_str(), passosDoQuadro, l[12].c_str());
         }
-        int i = std::atoi(l[9].c_str());
+        int i = std::atoi(l[13].c_str());
         if (i < 0 || i >= passosDoQuadro) continue;
         auto x = p.EntradaDoPasso(i);
         ++verificacoes;
-        if (!(x.Dx == F(l[10]) && x.Dy == F(l[11]) && x.AcaoPressionada == B(l[12]) && x.AcaoSegurada == B(l[13]) && x.LobPressionada == B(l[14])) && ++falhas <= 20)
+        if (!(x.Dx == F(l[14]) && x.Dy == F(l[15]) && x.AcaoPressionada == B(l[16]) && x.AcaoSegurada == B(l[17]) && x.LobPressionada == B(l[18]) &&
+              x.CortadoPressionado == B(l[19]) && x.AtaquePressionado == B(l[20]) && x.AtaqueSegurado == B(l[21]) && x.ModificadorSegurado == B(l[22])) &&
+            ++falhas <= 20)
             std::printf("FALHA: sequência %d, quadro %d, passo %d: entrada diferente\n", id, q, i);
     }
     std::printf("PassoFixo: %d verificações, %d falha(s).\n", verificacoes, falhas);

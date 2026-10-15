@@ -165,11 +165,11 @@ bool Jogador::PodeBaterAgora(const Bola& bola, float dt, bool jaQuicou) const
     return DistanciaAoPontoIdeal(cx, cy, bx, by) >= DistanciaAoPontoIdeal(bola.X, bola.Y);
 }
 
-void Jogador::IniciarBalanco(bool lob)
+void Jogador::IniciarBalanco(IntencaoDoGolpe intencao)
 {
     balanco = DuracaoDoBalanco;
     tempoNoBalanco = 0;
-    balancoDeLob = lob;
+    intencaoDoBalanco = intencao;
 }
 
 void Jogador::AvancarTempo(float dt)

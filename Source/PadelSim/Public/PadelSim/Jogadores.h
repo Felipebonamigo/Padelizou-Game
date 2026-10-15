@@ -72,7 +72,9 @@ public:
 
     float Balanco() const { return balanco; }
     float TempoNoBalanco() const { return tempoNoBalanco; }
-    bool BalancoDeLob() const { return balancoDeLob; }
+    /// O botão que começou o balanço (o último, se a raquete já parou).
+    IntencaoDoGolpe IntencaoDoBalanco() const { return intencaoDoBalanco; }
+    bool BalancoDeLob() const { return intencaoDoBalanco == IntencaoDoGolpe::Lob; }
     bool BalancoTerminouNoAr() const { return balancoTerminouNoAr; }
     bool NoInstanteDoContato() const { return noInstanteDoContato; }
 
@@ -99,14 +101,16 @@ public:
     bool AlcancaConfortavelmente(const Bola& bola) const;
     bool PodeBaterAgora(const Bola& bola) const;
     bool PodeBaterAgora(const Bola& bola, float dt, bool jaQuicou) const;
-    void IniciarBalanco(bool lob);
+    void IniciarBalanco(bool lob) { IniciarBalanco(lob ? IntencaoDoGolpe::Lob : IntencaoDoGolpe::Chapado); }
+    void IniciarBalanco(IntencaoDoGolpe intencao);
     void EncerrarBalanco() { balanco = 0; }
     void AvancarTempo(float dt);
     float DificuldadeDoGolpe(const Bola& bola) const;
 
 private:
     float balanco = 0, tempoNoBalanco = 0;
-    bool balancoDeLob = false, balancoTerminouNoAr = false, noInstanteDoContato = false;
+    IntencaoDoGolpe intencaoDoBalanco = IntencaoDoGolpe::Chapado;
+    bool balancoTerminouNoAr = false, noInstanteDoContato = false;
     float DistanciaAoPontoIdeal(float corpoX, float corpoY, float x, float y) const;
     void Limitar();
 };

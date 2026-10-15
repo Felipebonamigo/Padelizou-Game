@@ -71,8 +71,8 @@ Bola EstadoVisivel::CopiaDaBola() const
     return bola;
 }
 
-HumanoSimulado::HumanoSimulado(int32_t indiceDoJogador, PerfilDeHumano perfil, padel::Aleatorio& a, bool destro)
-    : Perfil(std::move(perfil)), indice(indiceDoJogador), aleatorio(&a),
+HumanoSimulado::HumanoSimulado(int32_t indiceDoJogador, PerfilDeHumano perfil, padel::Aleatorio& a, bool destro, padel::Controle c)
+    : Perfil(std::move(perfil)), indice(indiceDoJogador), aleatorio(&a), controle(c),
       eu(indiceDoJogador / 2, indiceDoJogador % 2, Perfil.Nome, true, Jogador::VelocidadeDoHumano),
       corpoNoContato(indiceDoJogador / 2, indiceDoJogador % 2, Perfil.Nome, true, Jogador::VelocidadeDoHumano)
 {
@@ -160,9 +160,8 @@ Entrada HumanoSimulado::NoRally(const EstadoVisivel& e, float dt)
             desdeOAperto = 0;
             plano = EscolherGolpe(e, zContato);
             segurarAcao = plano == PlanoDeGolpe::RemateForte;
-            bool lob = plano == PlanoDeGolpe::Lob || plano == PlanoDeGolpe::Chiquita;
             auto [dx, dy] = IrAte(xCorpo, yCorpo, distancia);
-            return {dx, dy, !lob, segurarAcao, lob};
+            return Aperto(dx, dy);
         }
     }
     if (apertouNestaBola)
@@ -171,15 +170,57 @@ Entrada HumanoSimulado::NoRally(const EstadoVisivel& e, float dt)
         if (desdeOAperto + 1.5f * dt >= Jogador::MomentoIdealDoBalanco)
         {
             auto [mx, my] = Mira(e, plano);
-            return {mx, my, false, segurarAcao, false};
+            return Segurando(mx, my);
         }
         auto [cx, cy] = IrAte(xCorpo, yCorpo, distancia);
-        return {cx, cy, false, segurarAcao, false};
+        return Segurando(cx, cy);
     }
     // Indo buscar: corre e freia pra chegar parado (se não reagiu ainda, fica onde está).
     if (!podeReagir) return {};
     auto [ix, iy] = IrAte(xCorpo, yCorpo, distancia);
     return {ix, iy, false, false, false};
+}
+
+/// O aperto do plano. Dois botões: lob (lob e chiquita) ou ação, segurada no remate forte. Quatro botões: B no lob, X na
+/// bandeja e na defesa, Y no ataque e nos remates (segurado no forte; com o RB na víbora) e A no resto.
+Entrada HumanoSimulado::Aperto(float dx, float dy) const
+{
+    Entrada e;
+    e.Dx = dx;
+    e.Dy = dy;
+    bool lob = plano == PlanoDeGolpe::Lob || plano == PlanoDeGolpe::Chiquita;
+    if (controle == padel::Controle::DoisBotoes)
+    {
+        e.AcaoPressionada = !lob;
+        e.AcaoSegurada = segurarAcao;
+        e.LobPressionada = lob;
+        return e;
+    }
+    bool cortado = plano == PlanoDeGolpe::Bandeja || plano == PlanoDeGolpe::Defesa;
+    bool ataque = plano == PlanoDeGolpe::Ataque || plano == PlanoDeGolpe::Remate || plano == PlanoDeGolpe::RemateForte || plano == PlanoDeGolpe::Vibora;
+    e.AcaoPressionada = !lob && !cortado && !ataque;
+    e.LobPressionada = lob;
+    e.CortadoPressionado = cortado;
+    e.AtaquePressionado = ataque;
+    e.AtaqueSegurado = segurarAcao;
+    e.ModificadorSegurado = plano == PlanoDeGolpe::Vibora;
+    return e;
+}
+
+/// Do aperto ao contato: os botões que seguem segurados (no de quatro, o Y do remate forte e o RB da víbora).
+Entrada HumanoSimulado::Segurando(float dx, float dy) const
+{
+    Entrada e;
+    e.Dx = dx;
+    e.Dy = dy;
+    if (controle == padel::Controle::DoisBotoes)
+    {
+        e.AcaoSegurada = segurarAcao;
+        return e;
+    }
+    e.AtaqueSegurado = segurarAcao;
+    e.ModificadorSegurado = plano == PlanoDeGolpe::Vibora;
+    return e;
 }
 
 bool HumanoSimulado::AindaNaoEHoraDeApertar(float segundosAteOPonto) const

@@ -23,7 +23,7 @@ public:
 private:
     int passosPorSegundo;
     double resto = 0;   // fração de passo que sobrou dos quadros anteriores, em [0, 1)
-    bool acaoPendente = false, lobPendente = false;
+    bool acaoPendente = false, lobPendente = false, cortadoPendente = false, ataquePendente = false;
     Entrada primeira{};
     int passosDoQuadro = 0;
 };

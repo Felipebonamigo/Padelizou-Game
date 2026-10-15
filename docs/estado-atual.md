@@ -2,6 +2,33 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 15/10/2026 — controle de quatro botões
+
+- O controle do `DESIGN.md` (A chapado, B lob, X cortado, Y ataque, RB modificador) entrou no `Padel.Core` (`7867e84`)
+  e no PadelSim: `OpcoesDaPartida.Controle = QuatroBotoes`, só no modo Manual. O botão que começa o balanço escolhe a
+  família do golpe e o analógico só a direção:
+
+  | Botão | Bola baixa | Bola alta |
+  |---|---|---|
+  | A | Normal (segurado no contato: Ataque) | Normal (idem) |
+  | B | Lob | Lob |
+  | X | Defesa (o slice) | Bandeja |
+  | Y | Ataque | Smash; segurado: por 4 (com lado forte, por 3); com RB: Víbora |
+
+  O padrão segue o de dois botões do Arena, que não muda. **Decisões minhas, a confirmar no playtest:** A segurado =
+  Ataque (o "segurar carrega potência" do design), B não vira chiquita (ficou fora da fatia), o RB por enquanto só
+  troca o smash pela víbora (o "espera a bola voltar do vidro" depende da assistência de movimento, que ainda não
+  existe) e o "globo de defesa" na rede é o mesmo lob.
+- O humano simulado joga de quatro botões com o mesmo plano de golpe: o Avançado faz 57,6 % dos pontos contra a Médio
+  (57,0 % no de dois; 24 partidas de 180 s).
+- 8 testes novos no Core, vistos falhar (Core 675 verdes; Arena `verificar_tudo.sh` verde). Os golpes do humano viraram
+  funções locais na mesma ordem de sorteio: regerado sem caso novo, o gabarito saiu idêntico.
+- Gabarito: partida 8, formato curto de quatro botões (semente 126: o humano passa por todos os golpes, um por 4, e o
+  set vai ao super tie-break 5-4), e o `PassoFixo` com X, Y e RB. Antes do porte, reprovaram a partida 8 e o
+  `PassoFixo`; depois, os 6 testes com 0 falhas em gcc e clang (partidas: 15.362 verificações). Teste novo em C++: a
+  Partida recusa quatro botões no Automático (visto falhar sem a recusa).
+- Pedido 0002 (quadra cinza) atualizado: os quatro botões no Enhanced Input.
+
 ## 14/10/2026 (noite, 4) — revisão da formação: o cambio e o time do humano
 
 - A revisão adversarial da Onda 5 achou três defeitos, corrigidos no `Padel.Core` (`2b7d8a5`) com teste escrito antes
