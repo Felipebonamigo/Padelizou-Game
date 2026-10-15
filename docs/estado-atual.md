@@ -17,7 +17,8 @@ Diário em ordem cronológica reversa: o mais novo em cima.
   números "antes" eram de antes da troca da libm e não se reproduziam.
 - Gabarito regerado; antes do porte o C++ reprovou onde devia (partidas 0–5 e 7). Porte em `Jogadores.cpp`
   (`CobrirOOutroLado` devolve se trocou; `cambioNaTrajetoria`): 6 testes com 0 falhas, gcc e clang.
-- **D10 remedido:** Iniciante × Médio 43,9 → 37,6 % dos pontos (21 → 4 % das partidas); o resto no `REALISMO.md`.
+- **D10 remedido e decidido:** Iniciante × Médio 43,9 → 37,6 % dos pontos (21 → 4 % das partidas); o resto no
+  `REALISMO.md`. Em 15/10 o Felipe decidiu: **o equilíbrio fica como está**.
 
 ## 14/10/2026 (noite, 3) — a dupla da IA em formação
 
