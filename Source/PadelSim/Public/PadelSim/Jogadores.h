@@ -37,6 +37,10 @@ inline constexpr PerfilDeIA Parceiro{5.8f, 0.18f, 0.8f, 0.55f, 0.04f, 0.3f, 0.15
 const PerfilDeIA& Por(Dificuldade d);
 } // namespace perfis
 
+/// Meia largura (s) da janela do timing em volta do momento ideal do balanço: Pro 0, Padrão ±20 ms, Casual ±40 ms
+/// (Partida.JanelaDoContato no Padel.Core; o porquê dos números está lá).
+float JanelaDoContato(Assistencia nivel);
+
 /// Posição, velocidade com inércia (acelera e freia como gente), alcance e o balanço da raquete.
 class Jogador
 {
@@ -67,6 +71,8 @@ public:
     float AlcanceConfortavel = 0.85f;
     float AlturaMaxima = 2.7f;
     float Cooldown = 0;
+    /// O nível de assistência deste jogador (humano), trocável a qualquer hora: vale a partir do passo seguinte.
+    padel::Assistencia Assistencia = padel::Assistencia::Pro;
     int32_t Golpes = 0;
     int32_t BalancosNoAr = 0;
 
@@ -77,6 +83,10 @@ public:
     bool BalancoDeLob() const { return intencaoDoBalanco == IntencaoDoGolpe::Lob; }
     bool BalancoTerminouNoAr() const { return balancoTerminouNoAr; }
     bool NoInstanteDoContato() const { return noInstanteDoContato; }
+    /// A raquete está na janela do contato da Assistencia em volta do momento ideal (no Pro, o próprio instante).
+    bool NaJanelaDoContato() const { return naJanelaDoContato; }
+    /// Este é o último passo da janela: a bola ao alcance tem de ser batida agora (no Pro, sempre).
+    bool FimDaJanelaDoContato() const { return fimDaJanelaDoContato; }
 
     float XDaMetade() const;
     bool Balancando() const { return balanco > 0; }
@@ -110,7 +120,7 @@ public:
 private:
     float balanco = 0, tempoNoBalanco = 0;
     IntencaoDoGolpe intencaoDoBalanco = IntencaoDoGolpe::Chapado;
-    bool balancoTerminouNoAr = false, noInstanteDoContato = false;
+    bool balancoTerminouNoAr = false, noInstanteDoContato = false, naJanelaDoContato = false, fimDaJanelaDoContato = false;
     float DistanciaAoPontoIdeal(float corpoX, float corpoY, float x, float y) const;
     void Limitar();
 };
@@ -164,6 +174,8 @@ private:
     bool ladosTrocados = false;
     /// O CriadoEm do plano (a trajetória da bola) em que a dupla fez o último cambio: um por trajetória.
     float cambioNaTrajetoria = -std::numeric_limits<float>::infinity();
+    /// Quem ia na bola no último cambio: a trava é por trajetória e por quem vai (o outro pede outra troca).
+    const Jogador* quemIaNoCambio = nullptr;
     float xDaBolaLido = 0;
     float profundidadeDoHumanoLida = 0;
     bool humanoNaRede = false;

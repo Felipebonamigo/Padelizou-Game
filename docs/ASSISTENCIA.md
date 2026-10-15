@@ -1,4 +1,8 @@
-# Níveis de assistência — proposta (aguardando aprovação do Felipe)
+# Níveis de assistência — proposta
+
+> **15/10:** o Felipe disse "siga" depois desta proposta. A parte 1, a janela do timing, está feita (Core `1d0358f` e
+> PadelSim), com os números abaixo. O movimento assistido e o RB vêm depois, e o alvo de calibração continua a sugestão
+> do fim desta página até ele dizer outro.
 
 O `DESIGN.md` aprovou três níveis (Casual, Padrão, Pro), trocáveis a qualquer hora, que mudam o movimento, o
 rastro-fantasma da parede e a janela do timing. O rastro já existe (`rastro_fantasma::Prever`, 15/10). Movimento e

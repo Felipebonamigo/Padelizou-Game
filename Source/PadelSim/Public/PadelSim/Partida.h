@@ -68,6 +68,7 @@ struct OpcoesDaPartida
     padel::ModoDeGolpe ModoDeGolpe = padel::ModoDeGolpe::Manual;
     /// O esquema de botões do humano (padel::Controle). Quatro botões só no modo Manual: a Partida recusa o Automático.
     padel::Controle Controle = padel::Controle::DoisBotoes;
+    padel::Assistencia Assistencia = padel::Assistencia::Pro;
     std::optional<uint32_t> Semente;
     /// Pontos corridos (Americano/Mexicano): o total que a soma dos pontos precisa alcançar. Vazio = games e sets.
     std::optional<int32_t> PontosCorridos;
@@ -95,7 +96,8 @@ public:
 
     static const char* TextoDoMotivo(padel::Motivo motivo);
 
-    OpcoesDaPartida Opcoes;
+    /// Constante, como no C#: trocar o modo de golpe ou o controle depois de criar furaria a recusa do construtor.
+    const OpcoesDaPartida Opcoes;
     padel::Aleatorio Aleatorio;
     padel::Placar Placar;
     padel::Arbitro Arbitro;

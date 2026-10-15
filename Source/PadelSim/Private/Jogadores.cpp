@@ -172,11 +172,24 @@ void Jogador::IniciarBalanco(IntencaoDoGolpe intencao)
     intencaoDoBalanco = intencao;
 }
 
+float JanelaDoContato(Assistencia nivel)
+{
+    switch (nivel)
+    {
+    case Assistencia::Padrao: return 0.02f;
+    case Assistencia::Casual: return 0.04f;
+    case Assistencia::Pro: break;
+    }
+    return 0;
+}
+
 void Jogador::AvancarTempo(float dt)
 {
     Cooldown = mat::Max(0, Cooldown - dt);
     balancoTerminouNoAr = false;
     noInstanteDoContato = false;
+    naJanelaDoContato = false;
+    fimDaJanelaDoContato = false;
     if (balanco > 0)
     {
         float antes = tempoNoBalanco;
@@ -185,6 +198,17 @@ void Jogador::AvancarTempo(float dt)
         // O passo mais perto do momento ideal (a 120 Hz, o 14º: 0,1167 s): o que cruza o momento menos meio passo.
         float meioPasso = dt / 2;
         noInstanteDoContato = antes + meioPasso < MomentoIdealDoBalanco && tempoNoBalanco + meioPasso >= MomentoIdealDoBalanco;
+        float janela = JanelaDoContato(Assistencia);
+        if (janela <= 0)
+        {
+            naJanelaDoContato = noInstanteDoContato;
+            fimDaJanelaDoContato = true;
+        }
+        else
+        {
+            naJanelaDoContato = tempoNoBalanco + meioPasso >= MomentoIdealDoBalanco - janela && tempoNoBalanco - meioPasso < MomentoIdealDoBalanco + janela;
+            fimDaJanelaDoContato = tempoNoBalanco + dt - meioPasso >= MomentoIdealDoBalanco + janela;
+        }
         if (balanco == 0) balancoTerminouNoAr = true;
     }
 }
@@ -436,9 +460,12 @@ std::pair<float, float> IA::LugarNaFormacao(Jogador& j, const Jogador& parceiro,
         {
             float dele = std::fabs(p->AlvoY);
             profundidade = mat::Limitar(mat::Limitar(minha, dele - folga, dele + folga), ProfundidadeDaRede, ProfundidadeMaximaDoBloco);
-            // Um cambio por trajetória: a releitura (quique, parede) não desfaz a troca no meio do caminho.
-            if (p->CriadoEm != cambioNaTrajetoria && CobrirOOutroLado(j, XDoCorpo(*p, parceiro), centro))
+            // Um cambio por trajetória e por quem vai na bola: o mesmo jogador não desfaz a troca, o outro pede outra.
+            if ((p->CriadoEm != cambioNaTrajetoria || &parceiro != quemIaNoCambio) && CobrirOOutroLado(j, XDoCorpo(*p, parceiro), centro))
+            {
                 cambioNaTrajetoria = p->CriadoEm;
+                quemIaNoCambio = &parceiro;
+            }
         }
     }
     else if (esperaOParceiro[i] && formacao[i] == formacao[parceiro.Indice])

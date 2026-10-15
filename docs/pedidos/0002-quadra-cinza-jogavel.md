@@ -38,7 +38,8 @@ câmera de TV, drive, lob e saque, e o placar.**
 7. **Modo de golpe:** opção no menu de debug entre `Manual` com quatro botões (o timing é seu; o padrão) e `Automatico`
    (bate sozinho), que é o "Casual" provisório do design. O `Automatico` só existe com `Controle::DoisBotoes` (a
    Partida recusa a outra combinação com `std::invalid_argument`): no de dois botões, frente/trás/lado no analógico é que
-   escolhem o golpe.
+   escolhem o golpe. `Partida::Opcoes` é `const`: trocar o modo é criar uma `Partida` nova (a próxima partida).
+   Assistência (`Jogador::Assistencia`: Pro, Padrão, Casual) muda a qualquer hora, direto no jogador.
 8. **Placar de TV** mínimo (UMG): pontos com `Placar.TextoDosPontos(time)`, games e sets, a `Mensagem` da partida
    quando houver. Fim de partida: tela com `Placar.Resumo()` e "jogar de novo". A partida da fatia é o **formato
    curto** do design: `OpcoesDaPartida{ .GamesPorSet = 4, .PontosDoTieBreak = 10 }` (set até 4, super tie-break a 10).

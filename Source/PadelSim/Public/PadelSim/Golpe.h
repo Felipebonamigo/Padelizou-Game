@@ -19,6 +19,9 @@ enum class IntencaoDoGolpe : int32_t { Chapado, Lob, Cortado, Ataque };
 /// DoisBotoes (o do Arena): ação e lob, e o analógico escolhe o golpe com a situação. QuatroBotoes (o da fatia): o botão
 /// que começa o balanço escolhe a família do golpe e o analógico só a direção (Partida::EscolherGolpeDoHumano).
 enum class Controle : int32_t { DoisBotoes, QuatroBotoes };
+/// O nível de assistência do humano, de cada jogador e trocável a qualquer hora (Jogador::Assistencia). Hoje muda a janela
+/// do timing (JanelaDoContato): no Pro, o instante do balanço; no Padrão e no Casual, o melhor passo de uma janela em volta.
+enum class Assistencia : int32_t { Pro, Padrao, Casual };
 
 /// Um golpe decidido: onde a bola deve cair, em quanto tempo, com que efeito e de que lado do corpo. Lancamento,
 /// quando vem, é a velocidade exata que um solucionador já simulou; sem ele, a partida calcula pelo alvo.

@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em bc09d73
+# gabarito do Padel.Core em d781e64
 id,passo,acao,time,ladoDaCaixa,direita,tipo,x,y,z,lado,parede,superficie,porta,decisao,para,motivo,faltas,emSaque,golpeador,quicou,tocou,cruzou,podeGolpear0,podeGolpear1
 0,0,saque,1,1,0,,,,,,,,,-1,-2,-1,0,1,1,0,0,0,0,0
 0,1,evento,-1,0,0,1,-2.4031103,-1.9715452,1.3766172,-1,1,2,0,1,-1,4,1,1,1,0,0,0,0,0

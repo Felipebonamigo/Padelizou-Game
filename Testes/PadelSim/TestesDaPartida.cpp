@@ -12,6 +12,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #ifndef PASTA_DO_GABARITO
@@ -109,6 +110,10 @@ Linha NomesDasColunas(const std::string& arquivo)
 }
 } // namespace
 
+// Revisão de 15/10: no C# as opções da partida não mudam depois de criada; aqui um campo público mutável deixava trocar o
+// modo de golpe depois do construtor, furando a recusa de quatro botões no Automático.
+static_assert(std::is_const_v<decltype(padel::Partida::Opcoes)>, "Partida::Opcoes tem de ser const, como no C#");
+
 int main()
 {
     constexpr float Passo = 1.f / 120.f;
@@ -135,6 +140,7 @@ int main()
         o.Semente = static_cast<uint32_t>(std::strtoul(c[10].c_str(), nullptr, 10));
         if (std::atoi(c[11].c_str()) >= 0) o.PontosCorridos = std::atoi(c[11].c_str());
         o.Controle = static_cast<Controle>(std::atoi(c[21].c_str()));
+        o.Assistencia = static_cast<Assistencia>(std::atoi(c[22].c_str()));
         const int passosEsperados = std::atoi(c[12].c_str());
 
         int passo = 0;

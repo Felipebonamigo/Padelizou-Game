@@ -2,6 +2,28 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 15/10/2026 (3) — janela do timing e os achados da revisão adversarial
+
+- **Assistência, parte 1 (janela do timing):** `Assistencia { Pro, Padrao, Casual }`, de cada jogador e trocável a
+  qualquer hora (`Jogador::Assistencia`; o inicial dos humanos em `OpcoesDaPartida`). No Pro (o padrão, o jogo de hoje) a
+  raquete só pega a bola no instante do balanço; no Padrão (±20 ms) e no Casual (±40 ms), no passo da janela com a bola
+  mais perto do ideal. Core `1d0358f`; números e proposta inteira em `docs/ASSISTENCIA.md`. Movimento assistido e o RB
+  mirando a saída de parede vêm depois.
+- **Revisão adversarial de hoje** (achados corrigidos, cada um com teste visto falhar ou mutante que agora reprova):
+  - ALTA: a trava de "um cambio por trajetória" bloqueava o cambio legítimo de quando o replanejamento passa a bola pro
+    outro (Difícil: 1.429 passos com os dois na mesma metade). Agora vale por trajetória e por quem vai (`3c0318e`).
+    `REALISMO.md` e D10 remedidos: Iniciante × Médio 37,5 % dos pontos.
+  - MÉDIA: a sala online aceitava quatro botões e assistência, que o protocolo não carrega; o `ServidorDaPartida` agora
+    recusa (`4c56571`). No C++, `Partida::Opcoes` era mutável e furava a recusa do Automático: virou `const`, com
+    `static_assert` no teste.
+  - BAIXA: o rastro dava saída de parede a uma bola morta (2º quique e vidro no mesmo passo); o teste do rastro era
+    tautológico (agora compara com a bola da `Partida`); a prioridade dos botões juntos não tinha teste; e duas frases
+    deste diário eram falsas (abaixo, corrigidas).
+- **Gabarito novo, `golpes-do-humano.csv`:** 45 cenas dos caminhos que nenhuma partida exercita (A segurado, por 3, smash
+  de recurso, botões juntos, víbora com RB e a janela). Antes do porte reprovaram as 12 da janela, a partida (cambio e
+  janela, partidas 0–5 e 7–10) e o rastro novo (2º quique e vidro); portado, 8 testes verdes em gcc e clang. Teste novo:
+  `TestesDosGolpesDoHumano`.
+
 ## 15/10/2026 (2) — rastro-fantasma da saída de parede
 
 - Pilar 1 do design ("a parede é a estrela"): `RastroFantasma.Prever` no `Padel.Core` (`2c48d97`) e
@@ -11,7 +33,8 @@ Diário em ordem cronológica reversa: o mais novo em cima.
 - Como o Unreal usa, pelo nível de assistência do design: **Casual**, desenha a partir de `PrimeiroDepoisDaParede`
   assim que a bola vem; **Padrão**, pede o rastro no passo do evento `Parede` (aí ele inteiro é a saída); **Pro**, nada.
   Vai num pedido da etapa de semanas 5–6 (os 6 golpes e a saída de parede), depois da quadra cinza.
-- 9 testes no Core, vistos falhar, entre eles o de que o rastro é bit a bit o caminho da bola quando ninguém bate (Core
+- 9 testes no Core; com a casca vazia, 8 falharam (o da bola fora de jogo já passava), entre eles o de que o rastro é o
+  caminho da bola quando ninguém bate — que só ficou de verdade na revisão de 15/10 (agora compara com a `Partida`) (Core
   684 verdes; Arena `verificar_tudo.sh` verde). Gabarito com 8 rastros (`rastros.csv`, `rastros-pontos.csv`); o C++
   reprovou com a casca vazia (1.496 de 1.502) e, portado, deu 0 falhas; 7 testes verdes em gcc e clang.
 
@@ -36,7 +59,8 @@ Diário em ordem cronológica reversa: o mais novo em cima.
   (57,0 % no de dois; 24 partidas de 180 s).
 - 8 testes novos no Core, vistos falhar (Core 675 verdes; Arena `verificar_tudo.sh` verde). Os golpes do humano viraram
   funções locais na mesma ordem de sorteio: regerado sem caso novo, o gabarito saiu idêntico.
-- Gabarito: partida 8, formato curto de quatro botões (semente 126: o humano passa por todos os golpes, um por 4, e o
+- Gabarito: partida 8, formato curto de quatro botões (semente 126: o humano passa pelas sete famílias, com um por 4 — mas
+  não por 3 nem A segurado, que estão em `golpes-do-humano.csv` desde a revisão de 15/10 —, e o
   set vai ao super tie-break 5-4), e o `PassoFixo` com X, Y e RB. Antes do porte, reprovaram a partida 8 e o
   `PassoFixo`; depois, os 6 testes com 0 falhas em gcc e clang (partidas: 15.362 verificações). Teste novo em C++: a
   Partida recusa quatro botões no Automático (visto falhar sem a recusa).

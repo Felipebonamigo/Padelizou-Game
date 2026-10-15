@@ -30,7 +30,7 @@ endif()
 
 enable_testing()
 # Um executável por área, todos contra o gabarito do Padel.Core.
-foreach(teste TestesDaMatematica TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro TestesDoRastroFantasma)
+foreach(teste TestesDaMatematica TestesDoPadelSim TestesDosGolpesEspeciais TestesDaPartida TestesDoPassoFixo TestesDoPlacarEDoArbitro TestesDoRastroFantasma TestesDosGolpesDoHumano)
     add_executable(${teste} Testes/PadelSim/${teste}.cpp)
     target_link_libraries(${teste} PRIVATE PadelSim)
     target_compile_definitions(${teste} PRIVATE PASTA_DO_GABARITO="${CMAKE_CURRENT_SOURCE_DIR}/Testes/PadelSim/Gabarito"

@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em bc09d73
+# gabarito do Padel.Core em d781e64
 id,nome,x,y,z,vx,vy,vz,wx,wy,wz,lado,emJogo,passosAntes,jaQuicou,pontos,primeiroDepoisDaParede
 0,saída de fundo,1,-8,1,0,20,3,0,0,0,1,1,0,0,238,147
 1,bola curta; dois quiques antes do vidro,1,-8,1,0,11,4,0,0,0,1,1,0,0,221,-1
@@ -8,3 +8,4 @@ id,nome,x,y,z,vx,vy,vz,wx,wy,wz,lado,emJogo,passosAntes,jaQuicou,pontos,primeiro
 5,lob alto que passa de 3 s,0,5,1,0,0.5,16,0,0,0,1,1,0,0,360,-1
 6,bola fora de jogo,0,5,1,0,0,0,0,0,0,1,0,0,0,0,-1
 7,saída de fundo do lado −1,-1,8,1,0,-20,3,0,0,0,-1,1,0,0,238,147
+8,2º quique e vidro no mesmo passo,0,9.900445,0.015,0,12,-3,0,0,0,1,1,0,1,1,-1

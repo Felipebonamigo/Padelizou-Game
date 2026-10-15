@@ -1,11 +1,13 @@
-# gabarito do Padel.Core em bc09d73
-id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets,controle
-0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,53683,6-1,0,0,39,309,17,0,0,0
-1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,38167,6-0,0,0,31,183,18,0,0,0
-2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,82304,2-6,1,0,45,505,33,0,0,0
-3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,60976,6-2,0,0,46,337,22,0,0,0
-4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,101811,4-6,1,0,57,596,54,0,0,0
-5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,27228,11-5,0,0,16,187,52,0,0,0
-6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,52690,6-3,0,0,54,242,14,0,0,0
-7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,61490,4-2,0,0,36,377,37,0,0,0
-8,formato curto; quatro botões; humano Avançado x Médio,1,1,1,4,10,1,Avançado,0,126,-1,71550,5-4(3),0,0,57,384,22,0,0,1
+# gabarito do Padel.Core em d781e64
+id,nome,dificuldade,pontoDeOuro,setsParaVencer,gamesPorSet,pontosDoTieBreak,humano0,perfilDoHumano,modoDeGolpe,semente,pontosCorridos,passos,resumo,vencedor,empate,pontos,golpes,maiorRally,faltas,lets,controle,assistencia
+0,IA x IA; Médio,1,1,1,6,7,0,-,0,42,-1,72038,6-2,0,0,47,441,24,0,0,0,0
+1,IA x IA; Fácil,0,1,1,6,7,0,-,0,7,-1,36566,6-1,0,0,33,173,13,0,0,0,0
+2,IA x IA; Difícil,2,1,1,6,7,0,-,0,9,-1,112511,4-6,1,0,54,715,63,0,0,0,0
+3,humano Intermediário x Médio; manual,1,1,1,6,7,1,Intermediário,0,11,-1,119157,7-6(4),0,0,76,687,30,0,0,0,0
+4,humano Avançado x Difícil; automático,2,1,1,6,7,1,Avançado,1,13,-1,120609,6-7(4),1,0,82,672,54,0,0,0,0
+5,pontos corridos 16; IA x IA,1,1,1,6,7,0,-,0,5,16,29854,9-7,0,0,16,199,52,0,0,0,0
+6,vantagem; humano Iniciante x Fácil,0,0,1,6,7,1,Iniciante,0,21,-1,52690,6-3,0,0,54,242,14,0,0,0,0
+7,formato curto; humano Avançado x Médio; manual,1,1,1,4,10,1,Avançado,0,31,-1,95639,5-4(6),0,0,60,552,37,0,0,0,0
+8,formato curto; quatro botões; humano Avançado x Médio,1,1,1,4,10,1,Avançado,0,126,-1,38465,4-1,0,0,32,222,21,0,0,1,0
+9,formato curto; quatro botões; Casual; humano Iniciante x Médio,1,1,1,4,10,1,Iniciante,0,41,-1,38749,1-4,1,0,33,190,17,0,0,1,2
+10,formato curto; quatro botões; Padrão; humano Intermediário x Médio,1,1,1,4,10,1,Intermediário,0,43,-1,51332,4-2,0,0,38,293,19,0,0,1,1

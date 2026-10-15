@@ -1,4 +1,4 @@
-# gabarito do Padel.Core em bc09d73
+# gabarito do Padel.Core em d781e64
 id,quadro,delta,dx,dy,acao,segurada,lob,cortado,ataque,ataqueSegurado,modificador,passos,passo,pdx,pdy,pacao,psegurada,plob,pcortado,pataque,pataqueSegurado,pmodificador
 0,0,0.016666666666666666,-1,-0.5,1,1,0,0,0,1,1,2,0,-1,-0.5,1,1,0,0,0,1,1
 0,0,0.016666666666666666,-1,-0.5,1,1,0,0,0,1,1,2,1,-1,-0.5,0,1,0,0,0,1,1

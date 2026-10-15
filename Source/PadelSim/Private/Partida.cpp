@@ -74,6 +74,8 @@ Partida::Partida(OpcoesDaPartida opcoes)
     Jogadores.emplace_back(0, 1, "Parceiro", h[1], h[1] ? Jogador::VelocidadeDoHumano : perfis::Parceiro.Velocidade);
     Jogadores.emplace_back(1, 0, "Rival 1", h[2], h[2] ? Jogador::VelocidadeDoHumano : rival.Velocidade);
     Jogadores.emplace_back(1, 1, "Rival 2", h[3], h[3] ? Jogador::VelocidadeDoHumano : rival.Velocidade);
+    for (auto& j : Jogadores)
+        if (j.Humano) j.Assistencia = Opcoes.Assistencia;
     IAs.reserve(2);
     IAs.emplace_back(0, perfis::Parceiro, Aleatorio);
     IAs.emplace_back(1, rival, Aleatorio);
@@ -246,7 +248,9 @@ void Partida::Rally(float dt)
             if (j.Humano && manual)
             {
                 // A raquete passa pelo ponto de contato uma vez por balanço: sem balanço, ou fora desse instante, a bola passa.
-                if (!j.NoInstanteDoContato() || !j.Alcanca(Bola)) continue;
+                // Com assistência, o instante vira uma janela, e o contato sai no passo dela com a bola mais perto do ideal.
+                if (!j.NaJanelaDoContato() || !j.Alcanca(Bola)) continue;
+                if (!j.FimDaJanelaDoContato() && !j.PodeBaterAgora(Bola, dt, Arbitro.QuicouNoReceptor)) continue;
             }
             else if (!j.PodeBaterAgora(Bola, dt, Arbitro.QuicouNoReceptor)) continue;
             Golpear(j);

@@ -38,6 +38,7 @@ Rastro Prever(const Bola& bola, int32_t lado, bool jaQuicou)
             case TipoDeEventoDaBola::Rede:
                 break;
             }
+            if (acabou) break;   // o que vem depois no mesmo passo já é de bola morta (o vidro depois do 2º quique)
         }
         if (acabou || !b.EmJogo || b.Parada || b.Rolando) break;
     }
