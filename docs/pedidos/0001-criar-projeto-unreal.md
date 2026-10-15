@@ -5,7 +5,8 @@
 ## Contexto
 
 `Source/PadelSim` é o motor do jogo em C++ puro, testado fora do Unreal contra o gabarito do `Padel.Core`: a física
-da bola, os golpes especiais, a partida inteira (placar, árbitro, jogadores, IA, humano simulado) e o `PassoFixo`.
+da bola, os golpes especiais, a partida inteira (placar, árbitro, jogadores, IA, humano simulado, controle de quatro
+botões, assistência), o `PassoFixo` e o rastro-fantasma.
 Rode `ctest --test-dir build` (skill `verificar`) para ver os números de hoje. Leia `CLAUDE.md` e `docs/DESIGN.md`.
 
 ## O que fazer
@@ -25,8 +26,8 @@ Rode `ctest --test-dir build` (skill `verificar`) para ver os números de hoje. 
      `PadelSim` preciso (opção do `ModuleRules` desta versão, ou `/fp:precise` no módulo). Diga no relatório o que
      encontrou.
 5. **Automation Spec `PadelSim.Gabarito`** em `Source/PadelizouGame/Private/Testes/` (ou num módulo de testes): lê
-   os CSVs de `Testes/PadelSim/Gabarito/` e faz as mesmas conferências dos quatro `Testes/PadelSim/Testes*.cpp`
-   (reaproveite o código; não reescreva as regras). **Todos com 0 falhas**: o motor não usa libm, então o resultado
+   os CSVs de `Testes/PadelSim/Gabarito/` e faz as mesmas conferências de todos os `Testes/PadelSim/Testes*.cpp` (o
+   glob é a lista; em 15/10 eram 8, de matemática a golpes do humano) — reaproveite o código, não reescreva as regras. **Todos com 0 falhas**: o motor não usa libm, então o resultado
    no Windows é o mesmo do Linux — o CI já prova isso com o MSVC. Uma falha aqui é o Unreal compilando com outras
    opções de ponto flutuante (passo 4). Rode pela linha de comando
    (`UnrealEditor-Cmd ... -ExecCmds="Automation RunTests PadelSim; Quit"`) e cole a saída.
