@@ -127,3 +127,14 @@ Ctrl → `RB=1`; Q → `X=1`; soltar zera tudo.
 3. Controle: **WASD** ou analógico esquerdo; **Espaço/A** saca e bate (chapado; segurado = ataque); **Shift/B** lob; **Q/X** cortado; **E/Y** ataque/smash;
    **Ctrl/RB** modificador; **F2** troca Manual ↔ Automático na próxima partida; **F3** assistência; **R/Start** jogar de novo.
 4. Sem editor, partida simulada: o comando da seção "Prova de partida" acima.
+
+### Ajustes depois do playtest do Felipe (15/10/2026)
+
+Retorno: "não dá para enxergar direito por causa da quadra, os bonecos estão feios, A e D estão com os lados invertidos, achei muito duro e não consegui analisar o jogo".
+
+1. **A/D invertidos — bug meu na conversão, não do motor.** No motor, `Dx > 0` do time da casa move para +x (`Partida::Avancar`: `Mover(e.Dx * j.Lado, ...)`, `Lado = +1`), e a câmera atrás da casa olha para -X do Unreal, onde a direita da tela é -Y. A conversão do 0001 punha Y = +x. **Agora `Coordenadas.h` é X = y, Y = -x, Z = z** (todos ×100). Teste antes: `Fumaca` e `Casca` passaram a exigir Y = -x; mutante (voltar ao +x) reprova `metros do PadelSim viram centímetros...` e `volta ao PadelSim...`. A resposta do 0001 que diz "Unreal Y = x" vale só até este ajuste.
+2. **Quadra tapando a visão:** a grade escura era opaca e a parede de perto cobria a quadra. Agora a grade também é translúcida (`M_Vidro` escuro, opacidade 0,28; vidro 0,14).
+3. **Bonecos:** cápsula de verdade (cilindro de 1,30 m + meia esfera de 50 cm em cada ponta = 1,8 m) com viseira escura na frente.
+4. **Duro demais:** a assistência inicial passou de Pro para **Casual** (janela de ±40 ms no timing; muda com F3 a qualquer hora). Novo **F4**: câmera lenta 100 % → 50 % → 25 % (`SetGlobalTimeDilation`; o passo fixo de 120 Hz segue valendo), para analisar o jogo.
+
+Reverificado neste turno: `PadelizouGame.*` 11 de 11 `Success`; partida simulada de novo no Pro com semente 42: `5-4(2)`, 711,0 s, Tick do ator com média de 0,051 ms (máximo 0,928 ms) — a conversão não mexeu na simulação. Capturas refeitas em `docs/imagens/`.

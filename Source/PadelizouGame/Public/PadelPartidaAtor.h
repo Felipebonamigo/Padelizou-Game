@@ -71,6 +71,7 @@ private:
     UPROPERTY(Transient) TObjectPtr<UInputAction> AcaoJogarDeNovo;
     UPROPERTY(Transient) TObjectPtr<UInputAction> AcaoTrocarModo;
     UPROPERTY(Transient) TObjectPtr<UInputAction> AcaoTrocarAssistencia;
+    UPROPERTY(Transient) TObjectPtr<UInputAction> AcaoTrocarVelocidade;
     FLeituraDoControle Leitura;      // o que está apertado agora
     bool bApertouA = false, bApertouB = false, bApertouX = false, bApertouY = false;   // arestas até o próximo quadro
     bool bPedidoDeNovaPartida = false;
@@ -85,7 +86,8 @@ private:
     UPROPERTY(Transient) TObjectPtr<UMaterialInterface> MaterialCor;
     UPROPERTY(Transient) TObjectPtr<UMaterialInterface> MaterialVidro;
     UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Corpos;     // 4 cápsulas (time*2 + índice)
-    UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Cabecas;
+    UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Cabecas;   // meia esfera de cima da cápsula
+    UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Bases;     // meia esfera de baixo
     UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Raquetes;
     UPROPERTY(Transient) TArray<TObjectPtr<UStaticMeshComponent>> Narizes;
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> Anel;
@@ -100,7 +102,8 @@ private:
     TUniquePtr<FPadelSimulacao> Sim;
     padel::OpcoesDaPartida OpcoesAtuais;
     padel::ModoDeGolpe ModoDaProximaPartida = padel::ModoDeGolpe::Manual;
-    padel::Assistencia AssistenciaAtual = padel::Assistencia::Pro;
+    padel::Assistencia AssistenciaAtual = padel::Assistencia::Casual;   // o Pro (timing de ±0 ms) é duro demais para começar
+    int32 IndiceDaVelocidade = 0;   // 0 = 100 %, 1 = 50 %, 2 = 25 % (câmera lenta para analisar o jogo)
     TUniquePtr<padel::Aleatorio> AleatorioDoHumano;
     TUniquePtr<padel::HumanoSimulado> HumanoSim;
     int32 Semente = 0;

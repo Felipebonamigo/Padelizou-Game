@@ -1,5 +1,5 @@
 // Fumaça do eixo e da escala: a bola do PadelSim, lançada de (0, 9, 1) rumo à rede a 60 quadros por segundo, tem de
-// aparecer no Unreal no lugar certo (cm, X = comprimento da quadra, Y = largura, Z = altura).
+// aparecer no Unreal no lugar certo (cm, X = comprimento da quadra, Y = -largura, Z = altura).
 #include "Misc/AutomationTest.h"
 #include "Coordenadas.h"
 #include "PadelSim/Bola.h"
@@ -14,11 +14,11 @@ void FFumacaSpec::Define()
 {
     Describe("Coordenadas", [this]()
     {
-        It("metros do PadelSim viram centímetros do Unreal, com y vindo para X e x para Y", [this]()
+        It("metros do PadelSim viram centímetros do Unreal, com y vindo para X e -x para Y", [this]()
         {
             const FVector P = PadelCoordenadas::ParaUnreal(2.f, 9.f, 1.f);
             TestEqual("X do Unreal = y do PadelSim em cm", P.X, 900.0);
-            TestEqual("Y do Unreal = x do PadelSim em cm", P.Y, 200.0);
+            TestEqual("Y do Unreal = -x do PadelSim em cm (a direita de quem olha da casa é -Y)", P.Y, -200.0);
             TestEqual("Z do Unreal = z do PadelSim em cm", P.Z, 100.0);
         });
         It("volta ao PadelSim sem perder nada", [this]()

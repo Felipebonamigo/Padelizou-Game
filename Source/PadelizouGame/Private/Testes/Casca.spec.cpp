@@ -86,15 +86,15 @@ void FCascaSpec::Define()
                 TestTrue("extensões positivas", C.MeiaExtensao.X > 0 && C.MeiaExtensao.Y > 0 && C.MeiaExtensao.Z > 0);
                 if (P.Parede == padel::QualParede::Lateral)
                 {
-                    // x = ±5 m no PadelSim é Y = ±500 cm no Unreal; a caixa fica de fora (|Y| > 500).
-                    TestTrue("lateral por fora", FMath::Abs(C.Centro.Y) > 500.0 && FMath::Sign(C.Centro.Y) == P.Sinal);
+                    // x = ±5 m no PadelSim é Y = ∓500 cm no Unreal (Y = -x); a caixa fica de fora (|Y| > 500).
+                    TestTrue("lateral por fora", FMath::Abs(C.Centro.Y) > 500.0 && FMath::Sign(C.Centro.Y) == -P.Sinal);
                     TestEqual("começa em Inicio (X do Unreal = y do PadelSim)", C.Centro.X - C.MeiaExtensao.X, P.Inicio * 100.0, 1e-3);
                 }
                 else
                 {
                     // y = ±10 m no PadelSim é X = ±1000 cm no Unreal.
                     TestTrue("fundo por fora", FMath::Abs(C.Centro.X) > 1000.0 && FMath::Sign(C.Centro.X) == P.Sinal);
-                    TestEqual("começa em Inicio (Y do Unreal = x do PadelSim)", C.Centro.Y - C.MeiaExtensao.Y, P.Inicio * 100.0, 1e-3);
+                    TestEqual("começa em Inicio (Y do Unreal = -x do PadelSim)", C.Centro.Y + C.MeiaExtensao.Y, -P.Inicio * 100.0, 1e-3);
                 }
                 TestEqual("base em ZMin", C.Centro.Z - C.MeiaExtensao.Z, P.ZMin * 100.0, 1e-3);
                 TestEqual("topo em ZMax", C.Centro.Z + C.MeiaExtensao.Z, P.ZMax * 100.0, 1e-3);

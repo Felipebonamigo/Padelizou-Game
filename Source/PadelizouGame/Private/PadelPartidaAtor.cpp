@@ -10,6 +10,7 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
+#include "Kismet/GameplayStatics.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "InputKeyEventArgs.h"
@@ -133,8 +134,13 @@ void APadelPartidaAtor::ConstruirQuadra()
         const FPadelCaixa C = PadelPaineis::CaixaDoPainel(P);
         const bool bVidro = P.Material == padel::Superficie::Vidro;
         (bVidro ? Vidros : Grades)++;
-        NovaForma(MalhaCubo, bVidro ? MaterialVidro : MaterialCor, bVidro ? FLinearColor(0.55f, 0.65f, 0.7f) : Grade, C.Centro,
-                  C.MeiaExtensao * 2.0 / 100.0);
+        // A grade também é translúcida (e escura): a parede de perto não pode esconder a quadra da câmera de TV.
+        UStaticMeshComponent* Painel = NovaForma(MalhaCubo, MaterialVidro, bVidro ? FLinearColor(0.55f, 0.65f, 0.7f) : Grade,
+                                                 C.Centro, C.MeiaExtensao * 2.0 / 100.0);
+        if (UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Painel->GetMaterial(0)))
+        {
+            Mid->SetScalarParameterValue(TEXT("Opacidade"), bVidro ? 0.14f : 0.28f);
+        }
     }
     UE_LOG(LogPadel, Log, TEXT("Quadra: %d painéis de vidro e %d de grade, desenhados de quadra::Paineis()"), Vidros, Grades);
 }
@@ -144,9 +150,11 @@ void APadelPartidaAtor::ConstruirJogadores()
     for (int32 I = 0; I < 4; ++I)
     {
         const FLinearColor Cor = (I / 2 == 0) ? CorDoTime0 : CorDoTime1;
-        Corpos.Add(NovaForma(MalhaCilindro, MaterialCor, Cor, FVector(0, 0, 67.5), FVector(0.5, 0.5, 1.35)));
-        Cabecas.Add(NovaForma(MalhaEsfera, MaterialCor, Cor * 1.3f, FVector(0, 0, 157.5), FVector(0.45, 0.45, 0.45)));
-        Narizes.Add(NovaForma(MalhaCubo, MaterialCor, FLinearColor::White, FVector(0, 0, 155), FVector(0.14, 0.10, 0.10)));
+        // Cápsula de 1,8 m: cilindro de 1,30 m com uma meia esfera de 50 cm em cada ponta, e uma viseira escura na frente.
+        Corpos.Add(NovaForma(MalhaCilindro, MaterialCor, Cor, FVector(0, 0, 90), FVector(0.5, 0.5, 1.3)));
+        Cabecas.Add(NovaForma(MalhaEsfera, MaterialCor, Cor, FVector(0, 0, 155), FVector(0.5, 0.5, 0.5)));
+        Bases.Add(NovaForma(MalhaEsfera, MaterialCor, Cor, FVector(0, 0, 25), FVector(0.5, 0.5, 0.5)));
+        Narizes.Add(NovaForma(MalhaCubo, MaterialCor, FLinearColor(0.02f, 0.02f, 0.03f), FVector(0, 0, 160), FVector(0.12, 0.34, 0.12)));
         Raquetes.Add(NovaForma(MalhaCilindro, MaterialCor, FLinearColor(0.95f, 0.95f, 0.95f), FVector(0, 0, 100), FVector(0.34, 0.34, 0.02)));
     }
     // Anel no chão do jogador local.
@@ -175,7 +183,8 @@ void APadelPartidaAtor::LerLinhaDeComando()
     FString Assist;
     if (FParse::Value(Linha, TEXT("PadelAssistencia="), Assist))
     {
-        if (Assist.Equals(TEXT("padrao"), ESearchCase::IgnoreCase)) AssistenciaAtual = padel::Assistencia::Padrao;
+        if (Assist.Equals(TEXT("pro"), ESearchCase::IgnoreCase)) AssistenciaAtual = padel::Assistencia::Pro;
+        else if (Assist.Equals(TEXT("padrao"), ESearchCase::IgnoreCase)) AssistenciaAtual = padel::Assistencia::Padrao;
         else if (Assist.Equals(TEXT("casual"), ESearchCase::IgnoreCase)) AssistenciaAtual = padel::Assistencia::Casual;
     }
 }
@@ -231,6 +240,7 @@ void APadelPartidaAtor::PrepararEntrada(APlayerController* PC)
     AcaoJogarDeNovo = NovaAcao(EInputActionValueType::Boolean);
     AcaoTrocarModo = NovaAcao(EInputActionValueType::Boolean);
     AcaoTrocarAssistencia = NovaAcao(EInputActionValueType::Boolean);
+    AcaoTrocarVelocidade = NovaAcao(EInputActionValueType::Boolean);
 
     // Mover: analógico esquerdo / WASD. X = direita do jogador, Y = rumo à rede (W).
     Contexto->MapKey(AcaoMover, EKeys::Gamepad_Left2D);
@@ -261,6 +271,7 @@ void APadelPartidaAtor::PrepararEntrada(APlayerController* PC)
     Contexto->MapKey(AcaoJogarDeNovo, EKeys::Gamepad_Special_Right);
     Contexto->MapKey(AcaoTrocarModo, EKeys::F2);
     Contexto->MapKey(AcaoTrocarAssistencia, EKeys::F3);
+    Contexto->MapKey(AcaoTrocarVelocidade, EKeys::F4);
 
     if (ULocalPlayer* LP = PC->GetLocalPlayer())
     {
@@ -297,6 +308,13 @@ void APadelPartidaAtor::PrepararEntrada(APlayerController* PC)
             AssistenciaAtual = static_cast<padel::Assistencia>((static_cast<int>(AssistenciaAtual) + 1) % 3);
             if (Sim) Sim->Partida().Jogadores[0].Assistencia = AssistenciaAtual;
         });
+        EIC->BindActionValueLambda(AcaoTrocarVelocidade, ETriggerEvent::Started, [this](const FInputActionValue&)
+        {
+            // Câmera lenta para analisar o jogo: o DeltaSeconds já vem dilatado, então o passo fixo de 120 Hz segue valendo.
+            static const float Fatores[] = {1.f, 0.5f, 0.25f};
+            IndiceDaVelocidade = (IndiceDaVelocidade + 1) % 3;
+            UGameplayStatics::SetGlobalTimeDilation(this, Fatores[IndiceDaVelocidade]);
+        });
     }
     else
     {
@@ -323,6 +341,7 @@ void APadelPartidaAtor::BeginPlay()
 
 void APadelPartidaAtor::EndPlay(const EEndPlayReason::Type Motivo)
 {
+    if (IndiceDaVelocidade != 0) UGameplayStatics::SetGlobalTimeDilation(this, 1.f);
     if (QuadrosMedidos > 0)
     {
         UE_LOG(LogPadel, Display, TEXT("PADEL_MEDIDA tick do ator: %lld quadros, média %.3f ms, máximo %.3f ms"), QuadrosMedidos,
@@ -401,10 +420,11 @@ void APadelPartidaAtor::AtualizarHud()
     const FString Evs = TextoDosEventos().ToString();
     const bool bManual = Pa.Opcoes.ModoDeGolpe == padel::ModoDeGolpe::Manual;
     const FString Modo = FString::Printf(
-        TEXT("Modo de golpe: %s | próxima partida: %s (F2) | Assistência: %s (F3) | R / Start: jogar de novo | A/Espaço  B/Shift  X/Q  Y/E  RB/Ctrl  WASD"),
+        TEXT("Modo de golpe: %s | próxima partida: %s (F2) | Assistência: %s (F3) | Velocidade: %s (F4) | R / Start: jogar de novo | A/Espaço  B/Shift  X/Q  Y/E  RB/Ctrl  WASD"),
         bManual ? TEXT("Manual (4 botões)") : TEXT("Automático (2 botões)"),
         ModoDaProximaPartida == padel::ModoDeGolpe::Manual ? TEXT("Manual") : TEXT("Automático"),
-        NomeDaAssistencia(Pa.Jogadores[0].Assistencia));
+        NomeDaAssistencia(Pa.Jogadores[0].Assistencia),
+        IndiceDaVelocidade == 0 ? TEXT("100%") : IndiceDaVelocidade == 1 ? TEXT("50%") : TEXT("25%"));
     if (Placar != UltimoPlacar || Mensagem != UltimaMensagem || Evs != UltimoEventos || Modo != UltimoModo)
     {
         UltimoPlacar = Placar;
@@ -424,9 +444,10 @@ void APadelPartidaAtor::AtualizarJogadores()
         const FVector P = PadelCoordenadas::ParaUnreal(J.X, J.Y, 0.f);
         const float Frente = J.Time == 0 ? 180.f : 0.f;   // o time da casa (y > 0) olha para -X do Unreal, a rede
         const FVector F = FRotator(0.f, Frente, 0.f).RotateVector(FVector::XAxisVector);
-        Corpos[I]->SetRelativeLocation(P + FVector(0, 0, 67.5));
-        Cabecas[I]->SetRelativeLocation(P + FVector(0, 0, 157.5));
-        Narizes[I]->SetRelativeLocationAndRotation(P + F * 22.0 + FVector(0, 0, 155), FRotator(0.f, Frente, 0.f));
+        Corpos[I]->SetRelativeLocation(P + FVector(0, 0, 90));
+        Cabecas[I]->SetRelativeLocation(P + FVector(0, 0, 155));
+        Bases[I]->SetRelativeLocation(P + FVector(0, 0, 25));
+        Narizes[I]->SetRelativeLocationAndRotation(P + F * 20.0 + FVector(0, 0, 162), FRotator(0.f, Frente, 0.f));
         // Raquete: um disco na mão; no balanço varre de trás para a frente do lado da raquete.
         const float Fase = J.Balancando() ? FMath::Clamp(J.TempoNoBalanco() / padel::Jogador::DuracaoDoBalanco, 0.f, 1.f) : -1.f;
         const float Psi = (Fase < 0.f ? 90.f : 120.f - 100.f * Fase) * static_cast<float>(J.LadoDaRaquete());

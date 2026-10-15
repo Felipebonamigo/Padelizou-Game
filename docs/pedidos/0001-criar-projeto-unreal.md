@@ -143,3 +143,7 @@ t=3.02 s, quadros=181, UE(cm)=(-948.3, 0.0, 33.5),   PadelSim(m)=(0.000, -9.483,
 
 Duplo clique em `PadelizouGame.uproject` (ou `UnrealEditor.exe PadelizouGame.uproject`), abra `Mapas/Fumaca` e dê Play.
 Automation: Window → Test Automation → `PadelSim` e `PadelizouGame`.
+
+### Correção posterior (15/10/2026)
+
+A conversão acima ("Unreal Y = x do PadelSim") estava errada para o jogo: o A/D saía invertido no pedido 0002. Vale **Unreal X = y, Y = -x, Z = z** (m → cm); ver "Ajustes depois do playtest" no pedido 0002.

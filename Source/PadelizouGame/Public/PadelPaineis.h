@@ -30,17 +30,17 @@ inline FPadelCaixa CaixaDoPainel(const padel::quadra::Painel& P)
     C.MeiaExtensao.Z = (P.ZMax - P.ZMin) * 0.5 * M;
     if (P.Parede == padel::QualParede::Lateral)
     {
-        // Parede lateral: x do PadelSim fixo (= Y do Unreal), ao longo dela é o y do PadelSim (= X do Unreal).
+        // Parede lateral: x do PadelSim fixo (Y do Unreal = -x), ao longo dela é o y do PadelSim (= X do Unreal).
         C.Centro.X = AoLongoCentro;
-        C.Centro.Y = Fora;
+        C.Centro.Y = -Fora;
         C.MeiaExtensao.X = AoLongoMeia;
         C.MeiaExtensao.Y = EspessuraEmCm * 0.5;
     }
     else
     {
-        // Parede de fundo: y do PadelSim fixo (= X do Unreal), ao longo dela é o x do PadelSim (= Y do Unreal).
+        // Parede de fundo: y do PadelSim fixo (= X do Unreal), ao longo dela é o x do PadelSim (Y do Unreal = -x).
         C.Centro.X = Fora;
-        C.Centro.Y = AoLongoCentro;
+        C.Centro.Y = -AoLongoCentro;
         C.MeiaExtensao.X = EspessuraEmCm * 0.5;
         C.MeiaExtensao.Y = AoLongoMeia;
     }
