@@ -24,5 +24,7 @@ inteiras, passo a passo), `TestesDoPassoFixo` e `TestesDoPlacarEDoArbitro` (tie-
 
 ## No PC (Unreal)
 
-A Automation Spec `PadelSim.Gabarito` roda os mesmos CSVs dentro do editor (pedido 0001). Pela linha de comando:
-`UnrealEditor-Cmd <projeto> -ExecCmds="Automation RunTests PadelSim; Quit" -unattended -nullrhi`. Leia o resumo.
+A Automation Spec `PadelSim.Gabarito` roda os mesmos CSVs dentro do editor (pedido 0001), e `PadelizouGame.*` cobre a casca (passo fixo,
+painéis, controle, fumaça, indicador). Compile antes (comando no `CLAUDE.md`, editor do PadelizouGame fechado) e rode:
+`UnrealEditor-Cmd PadelizouGame.uproject -ExecCmds="Automation RunTests PadelSim+PadelizouGame; Quit" -unattended -nullrhi`.
+Leia `Test Completed ... Result={Success|Fail}` de cada teste e `**** TEST COMPLETE. EXIT CODE: 0 ****`; 22 testes hoje.

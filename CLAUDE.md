@@ -35,6 +35,8 @@ as paredes como estrela, visual de transmissão. Estúdio de uma pessoa (Felipe)
   ```
   A primeira linha de cada CSV diz de que commit do Core ele saiu. Mudar só o C++ faz o gabarito reprovar — é o
   objetivo.
+- **Todo tipo ou função livre novo do `PadelSim` leva `PADELSIM_API`** (`PadelSim/Exportar.h`; vazia fora do Unreal). Sem ela o CMake
+  passa e o link do módulo no Unreal falha. Nada de `static constexpr float A = .., B = ..;` numa classe exportada (o MSVC recusa).
 - A ordem das operações em float importa: `(a*b)*c` ≠ `a*(b*c)`. Ao portar, copie a expressão como está no C#.
 
 ## Rodar
@@ -42,6 +44,18 @@ as paredes como estrela, visual de transmissão. Estúdio de uma pessoa (Felipe)
 ```bash
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build && ctest --test-dir build --output-on-failure
 ```
+
+## Rodar no Unreal (só no PC)
+
+```bash
+# compilar (Editor): feche o editor do PadelizouGame antes; com outros editores abertos, acrescente -NoHotReloadFromIDE
+"C:/Program Files/Epic Games/UE_5.8/Engine/Build/BatchFiles/Build.bat" PadelizouGameEditor Win64 Development -Project="$PWD/PadelizouGame.uproject" -WaitMutex
+# Automation (gabarito + casca + indicador)
+"C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" PadelizouGame.uproject -ExecCmds="Automation RunTests PadelSim+PadelizouGame; Quit" -unattended -nullrhi
+```
+
+Mapa padrão: `/Game/Mapas/QuadraCinza` (Automático por padrão; F2 Manual, F3 assistência, F4 câmera lenta). Mapas e materiais
+saem de `Ferramentas/*.py` (`-ExecutePythonScript`).
 
 ## Onde cada coisa roda
 

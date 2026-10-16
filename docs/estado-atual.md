@@ -2,6 +2,23 @@
 
 Diário em ordem cronológica reversa: o mais novo em cima.
 
+## 16/10/2026 — projeto Unreal e quadra cinza jogável (sessão local do PC)
+
+- **Pedidos 0001 e 0002 respondidos** (`docs/pedidos/`). `PadelizouGame.uproject` (UE 5.8.3) com os módulos `PadelizouGame`,
+  `PadelSim` e `PadelSimTestes` (Editor). `PadelSim.Gabarito` roda os 8 `Testes*.cpp` dentro do Unreal: **0 falhas**, os mesmos
+  números do ctest. O UBT 5.8 compila com `/fp:fast` por padrão e isso reprova o gabarito (mutante: Matemática 987 falhas, Partidas
+  72); o `PadelSim.Build.cs` fixa `FPSemantics = Precise` e vale para Editor e Game (os dois alvos compilam).
+- **Pedido à nuvem:** classe ou função livre nova do motor leva `PADELSIM_API` (`PadelSim/Exportar.h`), e nada de
+  `static constexpr float A = .., B = ..;` numa classe exportada (o MSVC recusa). Sem isso o CMake passa e o link do Unreal falha.
+- **Quadra cinza** (`/Game/Mapas/QuadraCinza`): `APadelPartidaAtor` dono da `Partida` + `PassoFixo(120)`, paredes de
+  `quadra::Paineis()`, quatro cápsulas, câmera de TV, Enhanced Input (4 botões), placar UMG. Partida inteira contra o Médio: Manual
+  `5-4(2)` e Automático `4-0`, Tick do ator em ~0,05 ms. `Coordenadas.h`: Unreal X = y, **Y = -x**, Z = z (m → cm).
+- **Playtest do Felipe:** A/D invertidos (era a conversão; corrigido), quadra tapando a visão (grade translúcida), bonecos feios
+  (cápsulas), Manual duro demais e "o botão não bate" (o Manual exige apertar ~0,12 s antes do contato). Hoje: **Automático por
+  padrão**, assistência Casual, F4 câmera lenta, e **indicador visual de quando apertar** no Manual (previsão com a física do PadelSim).
+- **Falta:** o Felipe jogar o Manual com o indicador e dizer o feeling; testar o gamepad físico; decidir se alarga a janela do Casual
+  (regra, vai pelo `Padel.Core`). A etapa seguinte do design (6 golpes e a saída de parede com o rastro-fantasma) vem depois.
+
 ## 15/10/2026 (4) — assistência, parte 2: o movimento assistido
 
 - Com o analógico solto, o humano que a IA do time mandou na bola anda sozinho até o ponto de contato (`IA::AlvoDoCorpo`:
