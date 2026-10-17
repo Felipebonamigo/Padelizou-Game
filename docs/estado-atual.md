@@ -16,6 +16,9 @@ Diário em ordem cronológica reversa: o mais novo em cima.
 - **Playtest do Felipe:** A/D invertidos (era a conversão; corrigido), quadra tapando a visão (grade translúcida), bonecos feios
   (cápsulas), Manual duro demais e "o botão não bate" (o Manual exige apertar ~0,12 s antes do contato). Hoje: **Automático por
   padrão**, assistência Casual, F4 câmera lenta, e **indicador visual de quando apertar** no Manual (previsão com a física do PadelSim).
+- **Rastro-fantasma e cor no pé (17/10):** o rastro da saída de parede aparece por assistência (Casual sempre, Padrão na batida do
+  vidro, Pro nada) e o anel do jogador fica verde/amarelo/vermelho pelo erro do golpe; 30 testes do Unreal verdes. Pronto sem o
+  Felipe; faltam os 6 golpes com animação e o 2×2 local, que dependem de captura e de controles.
 - **Falta:** o Felipe jogar o Manual com o indicador e dizer o feeling; testar o gamepad físico; decidir se alarga a janela do Casual
   (regra, vai pelo `Padel.Core`). A etapa seguinte do design (6 golpes e a saída de parede com o rastro-fantasma) vem depois.
 
