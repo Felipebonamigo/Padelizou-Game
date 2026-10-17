@@ -20,6 +20,7 @@ def param_vetor(mat, nome, padrao, x, y):
 
 # M_Cor: cor base e um pouco de rugosidade.
 m = novo("M_Cor")
+m.set_editor_property("used_with_instanced_static_meshes", True)   # o rastro-fantasma usa malha instanciada
 cor = param_vetor(m, "Cor", unreal.LinearColor(0.35, 0.35, 0.35, 1), -400, 0)
 mel.connect_material_property(cor, "", unreal.MaterialProperty.MP_BASE_COLOR)
 rug = mel.create_material_expression(m, unreal.MaterialExpressionConstant, -400, 200)

@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Coordenadas.h"
 #include "EnhancedInputComponent.h"
@@ -22,6 +23,7 @@
 #include "Misc/Paths.h"
 #include "PadelHudWidget.h"
 #include "PadelIndicador.h"
+#include "PadelRastro.h"
 #include "PadelPaineis.h"
 #include "PadelSim/Quadra.h"
 #include "UnrealClient.h"
@@ -163,6 +165,20 @@ void APadelPartidaAtor::ConstruirJogadores()
     Marcador->SetVisibility(false);
     // Anel no chão do jogador local.
     Anel = NovaForma(MalhaCilindro, MaterialCor, FLinearColor(1.f, 0.85f, 0.1f), FVector(0, 0, 1), FVector(1.1, 1.1, 0.02));
+    AnelMid = Cast<UMaterialInstanceDynamic>(Anel->GetMaterial(0));
+    // Rastro-fantasma: pontos ciano ao longo do caminho da bola depois da batida no vidro.
+    PontosDoRastro = NewObject<UInstancedStaticMeshComponent>(this);
+    PontosDoRastro->SetStaticMesh(MalhaEsfera);
+    PontosDoRastro->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    PontosDoRastro->SetCastShadow(false);
+    PontosDoRastro->SetupAttachment(Raiz);
+    PontosDoRastro->RegisterComponent();
+    if (MaterialCor)
+    {
+        UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(MaterialCor, this);
+        Mid->SetVectorParameterValue(TEXT("Cor"), FLinearColor(0.1f, 0.9f, 1.f));
+        PontosDoRastro->SetMaterial(0, Mid);
+    }
 }
 
 void APadelPartidaAtor::ConstruirBola()
@@ -218,7 +234,7 @@ void APadelPartidaAtor::IniciarPartida()
     }
 
     Eventos.Reset();
-    bCapturouRally = bCapturouFim = bCapturouIndicador = false;
+    bCapturouRally = bCapturouFim = bCapturouIndicador = bCapturouRastro = false;
     FimDesde = -1.0;
     NomeDoModoParaArquivo = ModoDaProximaPartida == padel::ModoDeGolpe::Manual ? TEXT("manual") : TEXT("automatico");
     if (Hud) Hud->MostrarFim(false, FText::GetEmpty());
@@ -363,9 +379,18 @@ void APadelPartidaAtor::AoEventoDaPartida(const padel::EventoDaPartida& E)
     case T::Golpe:
         Texto = FString::Printf(TEXT("Jogador %d: %s"), E.Jogador, E.Golpe ? NomeDoGolpe(*E.Golpe) : TEXT("golpe"));
         if (bTesteDeEntrada && E.Jogador == 0) UE_LOG(LogPadel, Display, TEXT("PADEL_EVENTO %s"), *Texto);
+        if (E.Jogador == 0 && Sim)
+        {
+            // O resultado do golpe, por cor no pé do jogador: verde, amarelo, vermelho (PadelRastro::CorDoErro).
+            CorDoPe = PadelRastro::CorDoErro(Sim->Partida().UltimoErroDoHumano);
+            CorDoPeAte = RelogioDeTela + 1.2;
+        }
         break;
     case T::Quique: Texto = TEXT("Quique"); break;
-    case T::Parede: Texto = TEXT("Parede"); break;
+    case T::Parede:
+        Texto = TEXT("Parede");
+        bBatidaNoVidroPendente = true;   // o Padrão tira o rastro no próximo quadro (AtualizarRastro)
+        break;
     case T::Ponto:
         Texto = FString::Printf(TEXT("PONTO time %d%s%s"), E.Time, E.Motivo ? TEXT(": ") : TEXT(""),
                                 E.Motivo ? *Utf8(padel::Partida::TextoDoMotivo(*E.Motivo)) : TEXT(""));
@@ -450,6 +475,64 @@ void APadelPartidaAtor::AtualizarHud()
     }
 }
 
+void APadelPartidaAtor::AtualizarRastro()
+{
+    // Rastro-fantasma da saída de parede (pilar 1), pela assistência do jogador local: Casual sempre; Padrão só na batida no
+    // vidro (rastro inteiro, congelado até a bola ser batida); Pro nada. A previsão é do PadelSim (rastro_fantasma::Prever).
+    PontosDoRastro->ClearInstances();
+    if (!Sim) return;
+    const padel::Partida& Pa = Sim->Partida();
+    const padel::Jogador& J = Pa.Jogadores[0];
+    const bool bVemPraMim = Pa.Estado == padel::EstadoDaPartida::Rally && Pa.Bola.EmJogo && Pa.Arbitro.PodeGolpear(J.Time);
+    if (!bVemPraMim)
+    {
+        bTemRastroDaBatida = false;
+        bBatidaNoVidroPendente = false;
+        return;
+    }
+    const bool bNoMeuLado = padel::quadra::LadoDe(Pa.Bola.Y) == J.Lado;
+    std::optional<FTrechoDoRastro> Trecho;
+    const padel::Rastro* Fonte = nullptr;
+    padel::Rastro Atual;
+    if (J.Assistencia == padel::Assistencia::Casual)
+    {
+        Atual = padel::rastro_fantasma::Prever(Pa.Bola, J.Lado, Pa.Arbitro.QuicouNoReceptor);
+        Fonte = &Atual;
+        Trecho = PadelRastro::Escolher(Atual, J.Assistencia, false);
+    }
+    else if (J.Assistencia == padel::Assistencia::Padrao)
+    {
+        if (bBatidaNoVidroPendente && bNoMeuLado)
+        {
+            RastroDaBatida = padel::rastro_fantasma::Prever(Pa.Bola, J.Lado, Pa.Arbitro.QuicouNoReceptor);
+            bTemRastroDaBatida = true;
+        }
+        bBatidaNoVidroPendente = false;
+        if (bTemRastroDaBatida)
+        {
+            Fonte = &RastroDaBatida;
+            Trecho = PadelRastro::Escolher(RastroDaBatida, J.Assistencia, true);
+        }
+    }
+    bBatidaNoVidroPendente = false;
+    if (!Trecho || !Fonte) return;
+    // Um ponto a cada 6 passos (50 ms); o último, maior, marca onde a saída termina.
+    for (int32 I = Trecho->Inicio; I < Trecho->Fim; I += 6)
+    {
+        const padel::PontoDoRastro& P = Fonte->Pontos[I];
+        const bool bUltimo = I + 6 >= Trecho->Fim;
+        const double D = bUltimo ? 0.2 : 0.09;
+        PontosDoRastro->AddInstance(FTransform(FRotator::ZeroRotator, PadelCoordenadas::ParaUnreal(P.X, P.Y, P.Z), FVector(D, D, D)));
+    }
+    if (bCapturas && !bCapturouRastro && PontosDoRastro->GetInstanceCount() >= 8)
+    {
+        bCapturouRastro = true;
+        const FString Arquivo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("docs/imagens") / FString::Printf(TEXT("rastro-%s.png"), *NomeDoModoParaArquivo));
+        FScreenshotRequest::RequestScreenshot(Arquivo, true, false);
+        UE_LOG(LogPadel, Display, TEXT("PADEL_CAPTURA %s"), *Arquivo);
+    }
+}
+
 void APadelPartidaAtor::AtualizarIndicador()
 {
     // Só no Manual: é o modo em que o aperto precisa de timing. Prevê o contato com a física do PadelSim (PadelIndicador.h).
@@ -517,7 +600,11 @@ void APadelPartidaAtor::AtualizarJogadores()
         const float Psi = (Fase < 0.f ? 90.f : 120.f - 100.f * Fase) * static_cast<float>(J.LadoDaRaquete());
         const FVector Dir = FRotator(0.f, Frente + Psi, 0.f).RotateVector(FVector::XAxisVector);
         Raquetes[I]->SetRelativeLocationAndRotation(P + Dir * 55.0 + FVector(0, 0, 100), FRotator(90.f, Frente + Psi, 0.f));
-        if (I == 0 && Anel) Anel->SetRelativeLocation(P + FVector(0, 0, 1));
+        if (I == 0 && Anel)
+        {
+            Anel->SetRelativeLocation(P + FVector(0, 0, 1));
+            if (AnelMid) AnelMid->SetVectorParameterValue(TEXT("Cor"), RelogioDeTela < CorDoPeAte ? CorDoPe : FLinearColor(1.f, 0.85f, 0.1f));
+        }
     }
     if (BolaMalha)
     {
@@ -667,6 +754,7 @@ void APadelPartidaAtor::Tick(float DeltaSeconds)
     }
     AtualizarJogadores();
     AtualizarIndicador();
+    AtualizarRastro();
     AtualizarCamera(DeltaSeconds);
     AtualizarHud();
     TratarCapturas();

@@ -5,6 +5,7 @@
 #include "PadelControle.h"
 #include "PadelSimulacao.h"
 #include "PadelSim/HumanoSimulado.h"
+#include "PadelSim/RastroFantasma.h"
 #include "PadelPartidaAtor.generated.h"
 
 class UCameraComponent;
@@ -14,6 +15,7 @@ class UMaterialInterface;
 class UPadelHudWidget;
 class UStaticMesh;
 class UStaticMeshComponent;
+class UInstancedStaticMeshComponent;
 class UMaterialInstanceDynamic;
 struct FInputActionValue;
 
@@ -60,6 +62,7 @@ private:
     void AtualizarCamera(float DeltaSeconds);
     void AtualizarHud();
     void AtualizarIndicador();
+    void AtualizarRastro();
     void AoEventoDaPartida(const padel::EventoDaPartida& Evento);
     void TratarCapturas();
     void RodarTesteDeEntrada(class APlayerController* PC);
@@ -99,6 +102,13 @@ private:
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> Anel;
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> BolaMalha;
     UPROPERTY(Transient) TObjectPtr<UStaticMeshComponent> Marcador;   // o indicador de contato, no chão
+    UPROPERTY(Transient) TObjectPtr<UInstancedStaticMeshComponent> PontosDoRastro;   // o rastro-fantasma da saída de parede
+    UPROPERTY(Transient) TObjectPtr<UMaterialInstanceDynamic> AnelMid;
+    padel::Rastro RastroDaBatida;      // Padrão: o rastro tirado no passo em que a bola bateu no vidro
+    bool bTemRastroDaBatida = false;
+    bool bBatidaNoVidroPendente = false;
+    double CorDoPeAte = 0.0;
+    FLinearColor CorDoPe = FLinearColor::White;
     FString UltimoIndicador;
     UPROPERTY(Transient) TObjectPtr<UPadelHudWidget> Hud;
     double CameraY = 0.0;
@@ -126,7 +136,7 @@ private:
     // Medição e capturas (linha de comando)
     bool bCapturas = false, bSairNoFim = false, bTesteDeEntrada = false;
     int32 EtapaDoTesteDeEntrada = 0;
-    bool bCapturouRally = false, bCapturouFim = false, bCapturouIndicador = false;
+    bool bCapturouRally = false, bCapturouFim = false, bCapturouIndicador = false, bCapturouRastro = false;
     double FimDesde = -1.0;
     double SomaDeMs = 0.0, MaiorMs = 0.0;
     int64 QuadrosMedidos = 0, QuadrosVistos = 0;
